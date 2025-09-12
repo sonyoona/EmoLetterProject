@@ -26,10 +26,17 @@ dependencies {
     //mysql 연동
     implementation 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     //lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    //Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' //필수인가? 모르겠음
+
+
 }
 
 tasks.named('test') {
