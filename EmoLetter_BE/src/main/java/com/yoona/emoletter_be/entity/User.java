@@ -41,12 +41,13 @@ public class User implements UserDetails {
     private LocalDateTime createAt;
 
     @Builder
-    public User(String userId, String password, String nickname, String email, LocalDateTime createAt) {
+    public User(String userId, String password, String nickname, String email, LocalDateTime createAt, String role) {
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.createAt = createAt;
+        this.role = role;
     }
 
 
@@ -87,6 +88,16 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true; //아직 사용 가능
+    }
+
+    //사용자 정보 갱신 시에 해당 필드 값만 변경
+    public void updateUser(String userId, String nickname) {
+        this.userId = userId;
+        this.nickname = nickname;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
 
