@@ -26,10 +26,31 @@ dependencies {
     //mysql 연동
     implementation 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     //lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    //Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' //필수인가? 모르겠음
+
+    //jwt
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+        //NoClassDefFoundError : Java 9 이상 환경(Java 11, 17 등)에서 JJWT(Java JWT) 라이브러리 구 버전(0.9.1 등)을 사용할 때 발생
+        //해결방법: jjwt 버전 업그래이드 or javax.xml.bind 패키지를 수동으로 추가
+        //하지만 javax.xml.bind 패키지를 수동으로 추가는 레거시 패키지에 의존하는 것이므로 비권장됩니다. -> 하지만 코드 바꾸기 귀찬아서 패키지 추가함
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'com.auth0:java-jwt:4.4.0'
+
+    //유효성 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
 }
 
 tasks.named('test') {
