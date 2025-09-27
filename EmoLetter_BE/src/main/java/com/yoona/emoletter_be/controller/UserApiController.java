@@ -86,7 +86,7 @@ public class UserApiController {
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         UserResponse userResponse = userService.login(loginRequest.getUserId(), loginRequest.getPassword());
 
-        String accessToken = tokenService.createAccessToken(userResponse.getUserId(), userResponse.getRole());
+        String accessToken = tokenService.createAccessTokenForLogin(userResponse.getUserId(), userResponse.getRole());
         String refreshToken = tokenService.createRefreshToken(userResponse.getUserId(), userResponse.getRole());
         userResponse.setAccessToken(accessToken);
 

@@ -1,9 +1,11 @@
 package com.yoona.emoletter_be.config;
 
+import com.yoona.emoletter_be.config.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,13 +15,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final UserDetailsService userService;
+    private final TokenProvider tokenProvider;
 
     //스프링 시큐리티 기능 비화성화
     @Bean
@@ -32,26 +37,35 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // csrf는 REST API 서버에서는 보통 disable
-                .csrf(csrf -> csrf.disable())
+            // csrf는 REST API 서버에서는 보통 disable
+            .csrf(csrf -> csrf.disable())
 
-                // URL별 권한 설정
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup", "/public/**").permitAll()  // 인증 필요 없는 URL
-                        .anyRequest().authenticated() // 나머지는 인증 필요
-                )
+            // 세션 비활성화 (JWT 기반 인증) - JWT의 핵심은 서버가 클라이언트 상태(세션)를 저장하지 않는 것
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
 
-                // 기본 로그인 폼 사용 (JWT 붙이기 전 임시)
-                .formLogin(form -> form
-                        .loginPage("/login") // 커스텀 로그인 페이지 (없으면 default 제공됨)
-                        .permitAll()
-                )
+            .authorizeHttpRequests(auth -> auth
+                    // 1. 회원가입: POST 요청만 명시적으로 permitAll
+                    .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
 
-                // 로그아웃 기능 (Spring Security 기본 제공)
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .permitAll()
-                );
+                    // 2. 로그인: POST 요청만 명시적으로 permitAll
+                    .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+
+                    // 3. 토큰 재발급: POST 요청만 명시적으로 permitAll
+                    .requestMatchers(HttpMethod.POST, "/api/token").permitAll()
+
+                    .requestMatchers(HttpMethod.DELETE, "/api/user/logout").permitAll()
+
+                    // 4. 나머지는 인증 필요
+                    .anyRequest().authenticated()
+            );
+
+        // 커스텀 JWT 필터 적용
+        http.addFilterBefore(
+                new TokenAuthenticationFilter(tokenProvider), // 구현한 JWT 필터
+                UsernamePasswordAuthenticationFilter.class    // ID/PW 기반 인증 필터 이전에 실행
+        );
 
         return http.build();
     }

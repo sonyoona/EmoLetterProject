@@ -33,6 +33,18 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
+        // ⭐️ 디버깅 로그 추가 ⭐️
+        System.out.println("Processing request path: " + request.getRequestURI());
+        // ... (기존 코드)
+
+        // 가져온 토큰이 유효한지 확인하고, 유효한 때는 인증 정보 설정
+        if (tokenProvider.validateToken(token)) {
+            // ...
+        } else {
+            // ⭐️ 디버깅 로그 추가 ⭐️
+            System.out.println("Token validation failed or token is null. Continuing filter chain.");
+        }
+
         filterChain.doFilter(request, response);
     }
 
@@ -42,4 +54,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+
 }

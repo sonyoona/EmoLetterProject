@@ -91,14 +91,12 @@ public class User implements UserDetails {
     }
 
     //사용자 정보 갱신 시에 해당 필드 값만 변경
-    public void updateUser(String userId, String nickname) {
-        this.userId = userId;
+    public void updateUser(String nickname) {
         this.nickname = nickname;
     }
 
     public void updatePassword(String password) {
         this.password = password;
     }
-
 
 }

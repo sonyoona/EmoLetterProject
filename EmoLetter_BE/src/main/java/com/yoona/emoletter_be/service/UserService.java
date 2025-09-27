@@ -57,12 +57,10 @@ public class UserService {
 
         //영속성 이용하여 정보 갱신
         users.updateUser(
-                userRequest.getUserId(),
                 userRequest.getNickname()
         );
 
         return UserResponse.builder()
-                .userId(users.getUserId())
                 .nickName(users.getNickname())
                 .build();
     }
@@ -83,6 +81,7 @@ public class UserService {
                     .email(users.getEmail())
                     .role(users.getRole())
                     .nickName(users.getNickname())
+                    .createAt(users.getCreateAt())
                     .build();
         } else{
             throw new IllegalArgumentException("Invalid Password Your Id : " + userId);

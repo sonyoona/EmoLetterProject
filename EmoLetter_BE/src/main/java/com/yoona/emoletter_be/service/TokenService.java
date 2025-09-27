@@ -47,18 +47,8 @@ public class TokenService {
 
     //accessToken -----------------------------------------------
 
-    //초기 accessToken 발급
-    public String createAccessToken(String refreshToken, String role) {
-        //토큰 유효성 검사에 실패하면 예외
-        if(!tokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("Invalid refresh token");
-        }
-
-        String userId = findUsersIdByToken(refreshToken);
-        if (userId == null) {
-            throw new IllegalArgumentException("Can't get userId from refresh token");
-        }
-
+    //초기 accessToken 발급 (login시 사용)
+    public String createAccessTokenForLogin(String userId, String role) {
         return tokenProvider.createAccessToken(userId, role);
     }
 
@@ -68,7 +58,7 @@ public class TokenService {
         String userId = tokenProvider.getUserIdFromExpiredToken(refreshToken); // [새로운 함수 필요]
 
         // 1. Redis에 해당 userId로 저장된 Refresh Token이 있는지 확인
-        RefreshToken storedToken = refreshTokenRepository.findByUserId(userId)
+        RefreshToken storedToken = refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new JwtValidationException("저장된 Refresh Token이 없습니다.", HttpStatus.UNAUTHORIZED));
 
         // 2. 전달된 Refresh Token과 Redis에 저장된 Token이 일치하는지 확인
@@ -93,7 +83,7 @@ public class TokenService {
     }
     //RefreshToken 조회
     public RefreshToken findRefreshTokenByUserId(String userId) {
-        return refreshTokenRepository.findByUserId(userId)
+        return refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("not founded refreshToken by userId"));
     }
     //RefreshToken 삭제
