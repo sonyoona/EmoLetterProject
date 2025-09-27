@@ -15,14 +15,12 @@ import java.time.LocalDateTime;
 public class AddDiaryRequest {
     private String content;
     private LocalDateTime createAt;
-    private String userId;
     private String emojiCode;
 
     public Diary toEntity(){
         return Diary.builder()
                 .content(content)
                 .createAt(createAt)
-                .userId(userId)
                 .emojiCode(emojiCode)
                 .build();
     }
