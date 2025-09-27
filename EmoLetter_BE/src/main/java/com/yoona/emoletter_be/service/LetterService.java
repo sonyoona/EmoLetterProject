@@ -3,7 +3,9 @@ package com.yoona.emoletter_be.service;
 import com.yoona.emoletter_be.dto.letter.AddLetterRequest;
 import com.yoona.emoletter_be.dto.letter.UpdateLetterRequest;
 import com.yoona.emoletter_be.entity.Letter;
+import com.yoona.emoletter_be.entity.User;
 import com.yoona.emoletter_be.repository.LetterRepository;
+import com.yoona.emoletter_be.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,24 @@ import java.util.List;
 @RequiredArgsConstructor // final이 붙거나 NotNull이 붙은 필드의 생성자 추가
 public class LetterService {
     private final LetterRepository letterRepository;
+    private final UserRepository userRepository;
 
     //편지 생성
-    public Letter save(AddLetterRequest request) {
-        return letterRepository.save(request.toEntity());
+    @Transactional
+    public Letter save(AddLetterRequest request, String authenticatedUserId) {
+        // 1. 인증된 사용자 ID (authenticatedUserId)로 User 엔티티를 조회합니다.
+        User user = userRepository.findById(authenticatedUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated User not found with ID: " + authenticatedUserId));
+
+        // 2. Letter 엔티티를 생성합니다.
+        Letter letter = Letter.builder()
+                .content(request.getContent())
+                .deliverDate(request.getDeliverDate())
+                .noteCode(request.getNoteCode())
+                .user(user) // 조회된 User 객체를 전달
+                .build();
+
+        return letterRepository.save(letter);
     }
 
     //전체 편지 조회

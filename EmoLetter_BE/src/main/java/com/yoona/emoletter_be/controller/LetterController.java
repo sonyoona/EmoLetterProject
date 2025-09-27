@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
 
 import java.util.List;
 
@@ -18,10 +19,14 @@ import java.util.List;
 public class LetterController {
     private final LetterService letterService;
 
-    //저장
+    // 저장
     @PostMapping()
-    public ResponseEntity<Letter> saveLetter(@RequestBody AddLetterRequest request) {
-        Letter savedLetter = letterService.save(request);
+    public ResponseEntity<Letter> saveLetter(@RequestBody AddLetterRequest request, Principal principal) {
+        // Principal 객체에서 사용자 ID를 가져옵니다.
+        // (User 엔티티가 UserDetails를 구현하고 getUsername()이 userId를 반환하기 때문)
+        String userId = principal.getName();
+        Letter savedLetter = letterService.save(request, userId);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLetter);
     }
 

@@ -15,19 +15,13 @@ import java.time.LocalDateTime;
 public class AddLetterRequest {
     private String content;
     private LocalDateTime deliverDate;
-    private boolean isOpened;
-    private LocalDateTime createAt;
     private String noteCode;
-    private String userId;
 
     public Letter toEntity() {
         return Letter.builder()
                 .content(content)
                 .deliverDate(deliverDate)
-                .isOpened(isOpened)
-                .createAt(createAt)
                 .noteCode(noteCode)
-                .userId(userId)
                 .build();
     }
 }
