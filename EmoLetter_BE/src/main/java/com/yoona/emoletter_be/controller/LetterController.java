@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
 
 import java.util.List;
 
@@ -18,10 +19,14 @@ import java.util.List;
 public class LetterController {
     private final LetterService letterService;
 
-    //저장
+    // 저장
     @PostMapping()
-    public ResponseEntity<Letter> saveLetter(@RequestBody AddLetterRequest request) {
-        Letter savedLetter = letterService.save(request);
+    public ResponseEntity<Letter> saveLetter(@RequestBody AddLetterRequest request, Principal principal) {
+        // Principal 객체에서 사용자 ID를 가져옵니다.
+        // (User 엔티티가 UserDetails를 구현하고 getUsername()이 userId를 반환하기 때문)
+        String userId = principal.getName();
+        Letter savedLetter = letterService.save(request, userId);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLetter);
     }
 
@@ -63,4 +68,19 @@ public class LetterController {
         return ResponseEntity.ok()
                 .build();
     }
+
+    // 알림을 띄울 수 있는 (배달 완료 & 미개봉) 편지 목록 조회
+    @GetMapping("/notification")
+    public ResponseEntity<List<LetterResponse>> getReadyToOpenLetters() {
+        // isDelivered=true 이고 isOpened=false 인 편지들만 조회하여 알림 용도로 사용합니다.
+        List<LetterResponse> letters = letterService.findReadyToOpenLetters()
+                .stream()
+                .map(LetterResponse::new)
+                .toList();
+
+        return ResponseEntity.ok()
+                .body(letters);
+    }
+
+
 }

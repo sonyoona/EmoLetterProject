@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 public class DiaryResponse {
     private final String content;
     private final LocalDateTime createAt;
-    private final String userId;
+    private final String nickname;
     private final String emojiCode;
 
     public DiaryResponse(Diary diary){
         this.content = diary.getContent();
         this.createAt = diary.getCreateAt();
-        this.userId = diary.getUserId();
+        this.nickname = diary.getUser().getNickname();
         this.emojiCode = diary.getEmojiCode();
     }
 

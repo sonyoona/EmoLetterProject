@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController//Http Res Body에 객체 데이터를 json 형식으로 반환하는 컨트롤러
@@ -20,18 +21,24 @@ public class DiaryController {
 
     //저장
     @PostMapping()
-    public ResponseEntity<Diary> addDiary(@RequestBody AddDiaryRequest request) {
-        // 디버깅을 위해 추가
-        System.out.println("Received emojiCode: " + request.getEmojiCode());
-        System.out.println("Received content: " + request.getContent());
-        Diary savedDiary = diaryService.save(request);
+    public ResponseEntity<Diary> addDiary(@RequestBody AddDiaryRequest request, Principal principal) {
+        // 인증된 사용자 ID 획득
+        String userId = principal.getName();
+
+        // System.out.println("Received emojiCode: " + request.getEmojiCode());
+        // System.out.println("Received content: " + request.getContent());
+
+        // 서비스 메서드에 userId 전달
+        Diary savedDiary = diaryService.save(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDiary);
     }
 
     //전체 조회
     @GetMapping()
-    public ResponseEntity<List<DiaryResponse>> getAllDiarys() {
-        List<DiaryResponse> diarys = diaryService.findAll()
+    public ResponseEntity<List<DiaryResponse>> getAllDiarys(Principal principal) {
+        String userId = principal.getName();
+
+        List<DiaryResponse> diarys = diaryService.findByUserId(userId)
                 .stream()
                 .map(DiaryResponse::new)
                 .toList();

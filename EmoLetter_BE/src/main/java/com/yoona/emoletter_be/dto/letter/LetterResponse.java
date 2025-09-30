@@ -12,6 +12,7 @@ public class LetterResponse {
     private boolean isOpened;
     private LocalDateTime createAt;
     private String noteCode;
+    private String nickname;
 
     public LetterResponse(Letter letter){
         this.content = letter.getContent();
@@ -19,5 +20,6 @@ public class LetterResponse {
         this.isOpened = letter.isOpened();
         this.createAt = letter.getCreateAt();
         this.noteCode = letter.getNoteCode();
+        this.nickname = letter.getUser().getNickname();
     }
 }
