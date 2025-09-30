@@ -23,6 +23,9 @@ public class Letter {
     @Column(name="deliver_date", nullable = false)
     private LocalDateTime deliverDate;
 
+    @Column(name="is_delivered", nullable = false)
+    private boolean isDelivered = false; // "배달 시간이 되어 알림이 가능한 상태인지"
+
     @Column(name="is_opened", nullable = false)
     private boolean isOpened = false;
 
@@ -41,15 +44,6 @@ public class Letter {
     @Column(name="note_code", nullable = false)
     private String noteCode;
 
-//    @Builder
-//    public Letter(String content, LocalDateTime deliverDate, boolean isOpened, LocalDateTime createAt, String userId, String noteCode) {
-//        this.content = content;
-//        this.deliverDate = deliverDate;
-//        this.createAt = createAt;
-//        this.isOpened = isOpened;
-//        this.userId = userId;
-//        this.noteCode = noteCode;
-//    }
     @Builder
     public Letter(String content, LocalDateTime deliverDate, User user, String noteCode) {
         this.content = content;
@@ -61,9 +55,14 @@ public class Letter {
         this.noteCode = noteCode;
     }
 
-
+    // isOpened 상태를 업데이트하는 메서드 추가
     public void updateIsOpened(boolean isOpened) {
         this.isOpened = isOpened;
+    }
+
+    // isDelivered 상태를 업데이트하는 메서드 추가
+    public void updateIsDelivered(boolean isDelivered) {
+        this.isDelivered = isDelivered;
     }
 
     public void update(String content, LocalDateTime deliverDate, LocalDateTime createAt, String noteCode) {

@@ -68,4 +68,19 @@ public class LetterController {
         return ResponseEntity.ok()
                 .build();
     }
+
+    // 알림을 띄울 수 있는 (배달 완료 & 미개봉) 편지 목록 조회
+    @GetMapping("/notification")
+    public ResponseEntity<List<LetterResponse>> getReadyToOpenLetters() {
+        // isDelivered=true 이고 isOpened=false 인 편지들만 조회하여 알림 용도로 사용합니다.
+        List<LetterResponse> letters = letterService.findReadyToOpenLetters()
+                .stream()
+                .map(LetterResponse::new)
+                .toList();
+
+        return ResponseEntity.ok()
+                .body(letters);
+    }
+
+
 }
