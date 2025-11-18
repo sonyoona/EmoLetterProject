@@ -60,7 +60,7 @@ jobs:
           script: |
             echo "🔧 배포 시작"
 
-            cd ~/app
+            cd ~/app/EmoLetter_BE
 
             # 1. env 파일 생성
             echo "${{ secrets.SPRING_ENV_FILE }}" > .env
@@ -74,10 +74,7 @@ jobs:
             # 4. 오래된 이미지 정리
             sudo docker image prune -af
 
-            # 5. EmoLetter_BE로 이동
-            cd /EmoLetter_BE
-            
-            # 6. docker compose 실행
+            # 5. docker compose 실행
             sudo docker compose up -d
 
             echo "🚀 배포 완료"
