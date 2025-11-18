@@ -67,7 +67,7 @@ jobs:
             echo "${{ secrets.SPRING_ENV_FILE }}" > .env
 
             # 2. 기존 컨테이너 종료
-            sudo docker compose down || true
+            sudo docker rm -f spring-be redis mysql || true
 
             # 3. 최신 이미지 가져오기
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/spring-be:latest
