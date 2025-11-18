@@ -57,6 +57,8 @@ public class WebSecurityConfig {
 
                     .requestMatchers(HttpMethod.DELETE, "/api/user/logout").permitAll()
 
+                    .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+
                     // 4. 나머지는 인증 필요
                     .anyRequest().authenticated()
             );
