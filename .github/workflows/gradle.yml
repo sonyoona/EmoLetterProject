@@ -27,7 +27,7 @@ jobs:
       # Build in BE Folder
       - name: Build and Push BE Docker Image
         run: |
-          cd be
+          cd EmoLetter_BE
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-be:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-be:latest
 
