@@ -49,6 +49,7 @@ jobs:
 
           source: "EmoLetter_BE/docker-compose.yml"
           target: "/home/${{ secrets.EC2_USER }}/app/"
+          strip_components: 1   # ← 상위 디렉토리 제거
 
       # Deploy on EC2
       - name: Deploy to EC2
@@ -60,7 +61,7 @@ jobs:
           script: |
             echo "🔧 배포 시작"
 
-            cd ~/app/EmoLetter_BE
+            cd ~/app/
 
             # 1. env 파일 생성
             echo "${{ secrets.SPRING_ENV_FILE }}" > .env
