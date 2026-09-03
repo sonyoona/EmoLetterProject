@@ -1,33 +1,73 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import * as diaryApi from '../api/diaryApi';
+import { useAuth } from './AuthContext';
+import { toDateKey } from '../utils/date';
 
-const DiaryContext = createContext();
+const DiaryContext = createContext(null);
 
 export const DiaryProvider = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const [diaries, setDiaries] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const addDiary = (date, emotion, content) => {
-    const dateKey = formatDateKey(date);
-    setDiaries((prev) => ({
-      ...prev,
-      [dateKey]: { emotion, content, date },
-    }));
-  };
+  const refresh = useCallback(async () => {
+    if (!isAuthenticated) {
+      setDiaries({});
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const list = await diaryApi.fetchDiaries();
+      // 같은 날짜에 여러 건이 있으면 가장 최근 것만 보여준다.
+      setDiaries(
+        list.reduce((acc, diary) => {
+          if (!diary.date) return acc;
+          acc[toDateKey(diary.date)] = diary;
+          return acc;
+        }, {})
+      );
+    } catch (err) {
+      setError(err.message);
+      setDiaries({});
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
 
-  const getDiary = (date) => {
-    const dateKey = formatDateKey(date);
-    return diaries[dateKey] || null;
-  };
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-  const formatDateKey = (date) => {
-    const d = new Date(date);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  };
+  const getDiary = useCallback((date) => (date ? diaries[toDateKey(date)] || null : null), [diaries]);
 
-  const value = {
-    diaries,
-    addDiary,
-    getDiary,
-  };
+  /** 같은 날짜에 이미 일기가 있으면 수정, 없으면 새로 저장한다. */
+  const saveDiary = useCallback(
+    async (date, emotion, content) => {
+      const existing = diaries[toDateKey(date)];
+      if (existing?.id) {
+        await diaryApi.updateDiary(existing.id, { date, emotion, content });
+      } else {
+        await diaryApi.createDiary({ date, emotion, content });
+      }
+      await refresh();
+    },
+    [diaries, refresh]
+  );
+
+  const removeDiary = useCallback(
+    async (diaryId) => {
+      await diaryApi.deleteDiary(diaryId);
+      await refresh();
+    },
+    [refresh]
+  );
+
+  const value = useMemo(
+    () => ({ diaries, loading, error, getDiary, saveDiary, removeDiary, refresh }),
+    [diaries, loading, error, getDiary, saveDiary, removeDiary, refresh]
+  );
 
   return <DiaryContext.Provider value={value}>{children}</DiaryContext.Provider>;
 };
@@ -39,4 +79,3 @@ export const useDiary = () => {
   }
   return context;
 };
-
