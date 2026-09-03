@@ -20,4 +20,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     // 필요하다면 특정 ID의 일기가 현재 사용자의 것인지 확인하는 메서드도 추가할 수 있습니다.
     Optional<Diary> findByDiaryIdAndUser_UserId(Long diaryId, String userId);
+
+    // 회원 탈퇴용: user를 지우기 전에 이 사용자의 일기를 먼저 지운다.
+    void deleteByUser_UserId(String userId);
 }

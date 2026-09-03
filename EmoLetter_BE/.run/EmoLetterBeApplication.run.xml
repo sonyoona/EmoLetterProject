@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EmoLetter BE (local)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <!-- Docker를 쓰지 않고 로컬에서 바로 실행하는 구성.
+         MySQL(3306)과 Redis(6379)는 미리 떠 있어야 한다. -->
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.env" />
+    </option>
+    <module name="EmoLetter_BE.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.yoona.emoletter_be.EmoLetterBeApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

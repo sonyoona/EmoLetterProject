@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class UpdateLetterRequest {
+    private String title;
     private String content;
     private LocalDateTime deliverDate;
-    private LocalDateTime createAt;
     private String noteCode;
 }

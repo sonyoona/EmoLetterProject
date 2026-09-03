@@ -17,6 +17,10 @@ public class Letter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long letterId;
 
+    // 기존 편지에는 제목이 없으므로 nullable로 둔다. (ddl-auto=update로 컬럼만 추가됨)
+    @Column(name = "title")
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -45,7 +49,8 @@ public class Letter {
     private String noteCode;
 
     @Builder
-    public Letter(String content, LocalDateTime deliverDate, User user, String noteCode) {
+    public Letter(String title, String content, LocalDateTime deliverDate, User user, String noteCode) {
+        this.title = title;
         this.content = content;
         this.deliverDate = deliverDate;
         // createAt, isOpened는 필드 초기화 값 사용 (생성자에서는 제외하거나 명시적으로 설정)
@@ -65,10 +70,12 @@ public class Letter {
         this.isDelivered = isDelivered;
     }
 
-    public void update(String content, LocalDateTime deliverDate, LocalDateTime createAt, String noteCode) {
+    // createAt(작성 시각)은 수정 대상이 아니다.
+    // 예전에는 요청 값으로 덮어썼는데, 클라이언트가 값을 빼먹으면 NOT NULL 컬럼이 null이 되어 저장이 깨졌다.
+    public void update(String title, String content, LocalDateTime deliverDate, String noteCode) {
+        this.title = title;
         this.content = content;
         this.deliverDate = deliverDate;
-        this.createAt = createAt;
         this.noteCode = noteCode;
     }
 }

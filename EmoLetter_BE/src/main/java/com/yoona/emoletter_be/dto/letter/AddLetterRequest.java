@@ -13,12 +13,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AddLetterRequest {
+    private String title;
     private String content;
     private LocalDateTime deliverDate;
     private String noteCode;
 
     public Letter toEntity() {
         return Letter.builder()
+                .title(title)
                 .content(content)
                 .deliverDate(deliverDate)
                 .noteCode(noteCode)

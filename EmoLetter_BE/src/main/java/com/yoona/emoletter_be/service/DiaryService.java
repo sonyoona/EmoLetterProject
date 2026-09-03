@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import com.yoona.emoletter_be.entity.User;
 
@@ -32,8 +33,10 @@ public class DiaryService {
                 .orElseThrow(() -> new IllegalArgumentException("Authenticated User not found with ID: " + authenticatedUserId));
 
         // 2. Diary 엔티티를 User 객체를 포함하여 생성합니다.
+        // createAt은 NOT NULL이다. 요청에 없으면 현재 시각으로 채운다.
         Diary diary = Diary.builder()
                 .content(request.getContent())
+                .createAt(request.getCreateAt() != null ? request.getCreateAt() : LocalDateTime.now())
                 .emojiCode(request.getEmojiCode())
                 .user(user) // User 객체를 전달
                 .build();
@@ -44,29 +47,32 @@ public class DiaryService {
 
     //일기 전체 조회
     public List<Diary> findByUserId(String userId) {
-        // 이 메서드를 사용하도록 Controller의 findAll()을 수정해야 합니다.
-        diaryRepository.findByUser_UserId(userId); //와 같은 메서드를 사용할 수 있습니다.
-        return diaryRepository.findAll();
+        return diaryRepository.findByUser_UserId(userId);
     }
 
-    //일기 상세 조회
-    public Diary findById(Long id) {
-        return diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("DiaryId not found: " + id));
+    //일기 상세 조회 (본인 것만)
+    public Diary findById(Long id, String userId) {
+        return findOwnedDiary(id, userId);
     }
 
-    //일기 수정
+    //일기 수정 (본인 것만)
     @Transactional
-    public Diary updateById(Long id, UpdateDiaryRequest request) {
-        Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("DiaryId not found: " + id));
+    public Diary updateById(Long id, UpdateDiaryRequest request, String userId) {
+        Diary diary = findOwnedDiary(id, userId);
         diary.update(request.getContent(), request.getCreateAt(), request.getEmojiCode());
 
         return diary;
     }
 
-    //일기 삭제
-    public void deleteById(Long id) {
-        diaryRepository.deleteById(id);
+    //일기 삭제 (본인 것만)
+    @Transactional
+    public void deleteById(Long id, String userId) {
+        diaryRepository.delete(findOwnedDiary(id, userId));
+    }
+
+    // id만 알면 남의 일기를 건드릴 수 있었기 때문에, 단건 접근은 모두 이 메서드를 거친다.
+    private Diary findOwnedDiary(Long id, String userId) {
+        return diaryRepository.findByDiaryIdAndUser_UserId(id, userId)
+                .orElseThrow(() -> new IllegalArgumentException("DiaryId not found: " + id));
     }
 }

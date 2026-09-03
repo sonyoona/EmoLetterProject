@@ -4,6 +4,7 @@ import com.yoona.emoletter_be.dto.letter.AddLetterRequest;
 import com.yoona.emoletter_be.dto.letter.UpdateLetterRequest;
 import com.yoona.emoletter_be.entity.Letter;
 import com.yoona.emoletter_be.entity.User;
+import com.yoona.emoletter_be.exception.BusinessRuleException;
 import com.yoona.emoletter_be.repository.LetterRepository;
 import com.yoona.emoletter_be.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -29,6 +30,7 @@ public class LetterService {
 
         // 2. Letter 엔티티를 생성합니다.
         Letter letter = Letter.builder()
+                .title(request.getTitle())
                 .content(request.getContent())
                 .deliverDate(request.getDeliverDate())
                 .noteCode(request.getNoteCode())
@@ -41,15 +43,15 @@ public class LetterService {
     //전체 편지 조회
     // 열린 편지인지 닫힌 편지인지에 따라 나뉩
     // return 값이 없는 경우 예외처리 필요
-    public List<Letter> findLetters(boolean isOpened) {
-        return letterRepository.findByIsOpened(isOpened);
+    public List<Letter> findLetters(String userId, boolean isOpened) {
+        return letterRepository.findByUser_UserIdAndIsOpened(userId, isOpened);
     }
 
     //상세 편지 조회 및 상태 변경
     @Transactional // 이 메소드가 끝날 때까지의 모든 DB 작업을 하나의 단위로 묶어줍니다.
-    public Letter findLetterById(Long letterId) {
-        // 1. ID로 편지를 조회합니다. 없으면 예외를 발생시킵니다.
-        Letter letter = letterRepository.findById(letterId)
+    public Letter findLetterById(Long letterId, String userId) {
+        // 1. 로그인한 사용자의 편지만 조회합니다. 없으면 예외를 발생시킵니다.
+        Letter letter = letterRepository.findByLetterIdAndUser_UserId(letterId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("not Founded letterId=" + letterId));
 
         // 2. 만약 편지가 열리지 않은 상태(false)라면, 열린 상태(true)로 변경합니다.
@@ -61,27 +63,49 @@ public class LetterService {
         return letter;
     }
 
+    /**
+     * 이 편지가 요청한 사용자의 것인지 확인하는 유일한 통로.
+     *
+     * findById로 먼저 찾고 나서 소유자를 비교하면 검사를 빠뜨리기 쉬우므로,
+     * 아예 "내 편지 중에서" 찾는 쿼리 하나만 쓴다.
+     * 남의 편지 id를 넣어도 없는 편지와 똑같이 취급되어 존재 여부조차 새어 나가지 않는다.
+     */
+    private Letter findOwnedLetter(Long letterId, String userId) {
+        return letterRepository.findByLetterIdAndUser_UserId(letterId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("LetterId not found: " + letterId));
+    }
+
     //편지 내용 수정
     @Transactional
-    public Letter updateById(Long letterId, UpdateLetterRequest request) {
-        Letter letter = letterRepository.findById(letterId)
-                .orElseThrow(() -> new IllegalArgumentException("LetterId not found: " + letterId));
-        letter.update(request.getContent(), request.getDeliverDate(), request.getCreateAt(), request.getNoteCode());
+    public Letter updateById(Long letterId, UpdateLetterRequest request, String userId) {
+        Letter letter = findOwnedLetter(letterId, userId);
+
+        // 이미 도착한 편지는 고칠 수 없다.
+        // 과거의 내가 쓴 글을 지금의 내가 고쳐 쓰면 타임캡슐이라는 전제가 무너진다.
+        if (letter.isDelivered() || !letter.getDeliverDate().isAfter(LocalDateTime.now())) {
+            throw new BusinessRuleException("이미 도착한 편지는 수정할 수 없어요.");
+        }
+
+        letter.update(request.getTitle(), request.getContent(), request.getDeliverDate(), request.getNoteCode());
 
         return letter;
     }
 
     //편지 삭제
-    public void deleteById(Long id) {
-        letterRepository.deleteById(id);
+    @Transactional
+    public void deleteById(Long letterId, String userId) {
+        // 존재 여부와 소유자를 함께 확인한 뒤 지운다.
+        // deleteById(id)만 부르면 남의 편지도 지워진다.
+        Letter letter = findOwnedLetter(letterId, userId);
+        letterRepository.delete(letter);
     }
 
 
 
     // 새로운 알림 API용 메서드: isDelivered=true, isOpened=false인 편지만 조회
-    public List<Letter> findReadyToOpenLetters() {
+    public List<Letter> findReadyToOpenLetters(String userId) {
         // 이미 배달 시간이 지나서 (스케줄러에 의해) isDelivered=true가 되었고, 아직 열리지 않은 편지들을 찾습니다.
-        return letterRepository.findByIsDeliveredTrueAndIsOpenedFalse();
+        return letterRepository.findByUser_UserIdAndIsDeliveredTrueAndIsOpenedFalse(userId);
     }
 
 

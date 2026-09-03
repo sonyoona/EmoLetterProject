@@ -9,6 +9,9 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      # 컨테이너끼리는 localhost로 서로를 찾을 수 없으므로 서비스 이름을 넘긴다.
+      MYSQL_HOST: mysql
+      REDIS_HOST: redis
     ports:
       - "8080:8080"
     depends_on:

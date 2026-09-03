@@ -49,8 +49,9 @@ public class DiaryController {
 
     //상세 조회
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiaryResponse> getDiary(@PathVariable("diaryId") Long diaryId) {
-        Diary diary = diaryService.findById(diaryId);
+    public ResponseEntity<DiaryResponse> getDiary(@PathVariable("diaryId") Long diaryId,
+                                                  Principal principal) {
+        Diary diary = diaryService.findById(diaryId, principal.getName());
 
         return ResponseEntity.ok()
                 .body(new DiaryResponse(diary));
@@ -59,8 +60,9 @@ public class DiaryController {
     //수정
     @PutMapping("/{diaryId}")
     public ResponseEntity<Diary> updateDiary(@PathVariable("diaryId") Long diaryId,
-                                             @RequestBody UpdateDiaryRequest request) {
-        Diary updatedDiary = diaryService.updateById(diaryId, request);
+                                             @RequestBody UpdateDiaryRequest request,
+                                             Principal principal) {
+        Diary updatedDiary = diaryService.updateById(diaryId, request, principal.getName());
 
         return ResponseEntity.ok()
                 .body(updatedDiary);
@@ -68,8 +70,9 @@ public class DiaryController {
 
     //삭제
     @DeleteMapping("/{diaryId}")
-    public ResponseEntity<Void> deleteDiary(@PathVariable("diaryId") Long diaryId) {
-        diaryService.deleteById(diaryId);
+    public ResponseEntity<Void> deleteDiary(@PathVariable("diaryId") Long diaryId,
+                                            Principal principal) {
+        diaryService.deleteById(diaryId, principal.getName());
         return ResponseEntity.ok()
                 .build();
     }

@@ -64,12 +64,21 @@ public class UserApiController {
         return ResponseEntity.ok().build();
     }
 
-    //사용자 탈퇴
+    /**
+     * 사용자 탈퇴.
+     *
+     * 계정만 지우고 끝내면 Redis에 refreshToken 사본이 남아, 탈퇴한 아이디로도
+     * 24시간 동안 accessToken을 계속 재발급받을 수 있다. 사본과 쿠키까지 함께 지운다.
+     */
     @DeleteMapping("/user")
-    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String authHeader,
+                                           HttpServletResponse response) {
         String userId = getUserIdFromHeader(authHeader);
-        //userId를 이용하여 삭제
+
         userService.deleteUser(userId);
+        tokenService.deleteRefreshTokenByUserId(userId);
+        response.addHeader("Set-Cookie", expiredRefreshTokenCookie().toString());
+
         return ResponseEntity.ok().build();
     }
 
@@ -129,15 +138,23 @@ public class UserApiController {
         tokenService.deleteRefreshToken(refreshToken);
 
         // 4. 브라우저 쿠키 삭제
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+        response.addHeader("Set-Cookie", expiredRefreshTokenCookie().toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * refreshToken 쿠키를 지우는 헤더 값.
+     * 브라우저는 "이름이 같고 maxAge가 0인 쿠키"를 받으면 기존 쿠키를 버린다.
+     * path는 발급할 때와 같아야 같은 쿠키로 인식되므로 "/"를 유지한다.
+     */
+    private ResponseCookie expiredRefreshTokenCookie() {
+        return ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(false) // HTTPS 환경에선 true
                 .path("/")
                 .maxAge(0)
                 .build();
-        response.addHeader("Set-Cookie", deleteCookie.toString());
-
-        return ResponseEntity.ok().build();
     }
 
 }

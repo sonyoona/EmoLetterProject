@@ -2,9 +2,20 @@ spring:
   datasource:
     #mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/${DATABASE_DB}?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+    # DATABASE_HOST를 쓰지 않는 이유:
+    # 기존 .env에 DATABASE_HOST=mysql(도커 서비스 이름)이 들어 있어 로컬 실행이 깨진다.
+    # .env에 없는 새 이름을 써서 로컬은 기본값 localhost, 도커는 compose가 mysql로 덮어쓰게 한다.
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${DATABASE_DB}?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
+
+  data:
+    redis:
+      # 기본값이 localhost가 아니라 127.0.0.1인 이유:
+      # 윈도우에서 localhost는 ::1(IPv6)을 먼저 시도하는데 WSL 포트 포워딩은 IPv4만 중계한다.
+      # 도커 배포 시에는 compose가 REDIS_HOST=redis로 덮어쓴다.
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
 
   jpa:
     hibernate:
@@ -20,6 +31,3 @@ jwt:
   expiration:
     access: 3600000 #1000 * 60 * 60 : 1시간
     refresh: 86400000 #1000 * 60 * 60 * 24 : 24시간
-  redis:
-    host: localhost
-    port: 6379

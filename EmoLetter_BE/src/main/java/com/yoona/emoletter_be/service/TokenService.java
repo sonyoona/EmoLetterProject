@@ -86,6 +86,15 @@ public class TokenService {
         return refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("not founded refreshToken by userId"));
     }
+    /**
+     * userId로 refreshToken 사본 삭제. (회원 탈퇴용)
+     * 탈퇴 시점에는 쿠키가 없을 수도 있고 만료됐을 수도 있으므로 토큰이 아니라 아이디로 지운다.
+     */
+    @Transactional
+    public void deleteRefreshTokenByUserId(String userId) {
+        refreshTokenRepository.deleteById(userId);
+    }
+
     //RefreshToken 삭제
     @Transactional
     public void deleteRefreshToken(String refreshToken) {
