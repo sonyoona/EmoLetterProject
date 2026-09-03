@@ -1,0 +1,1946 @@
+<title>JWT 필터 체인 해부</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --paper:     #F7F8FA;
+    --surface:   #FFFFFF;
+    --surface-2: #EDF0F5;
+    --ink:       #161B26;
+    --ink-soft:  #3B4557;
+    --muted:     #606A7E;
+    --rule:      #E1E6EE;
+    --rule-soft: #EFF2F7;
+
+    --token:      #B4741A;
+    --token-wash: #FAF1E2;
+    --steel:      #2A5D8F;
+    --steel-wash: #E7EEF6;
+
+    --pass:      #2E7A5F;
+    --pass-wash: #E4F1EC;
+    --fail:      #B3423E;
+    --fail-wash: #F8E8E7;
+
+    --shadow: 0 1px 2px rgba(22,27,38,.05), 0 10px 26px -14px rgba(22,27,38,.18);
+
+    --f-display: 'Gothic A1', 'Malgun Gothic', sans-serif;
+    --f-body: 'IBM Plex Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    --f-mono: 'IBM Plex Mono', 'D2Coding', Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:     #12151C;
+      --surface:   #1A1F29;
+      --surface-2: #222835;
+      --ink:       #E4E8F0;
+      --ink-soft:  #C0C8D6;
+      --muted:     #8D97AB;
+      --rule:      #2A313E;
+      --rule-soft: #232936;
+
+      --token:      #E5A94F;
+      --token-wash: #2E2718;
+      --steel:      #7FAEDB;
+      --steel-wash: #1C2836;
+
+      --pass:      #5FBF9A;
+      --pass-wash: #162A24;
+      --fail:      #E8837F;
+      --fail-wash: #2E1D1D;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.75);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:     #12151C;
+    --surface:   #1A1F29;
+    --surface-2: #222835;
+    --ink:       #E4E8F0;
+    --ink-soft:  #C0C8D6;
+    --muted:     #8D97AB;
+    --rule:      #2A313E;
+    --rule-soft: #232936;
+
+    --token:      #E5A94F;
+    --token-wash: #2E2718;
+    --steel:      #7FAEDB;
+    --steel-wash: #1C2836;
+
+    --pass:      #5FBF9A;
+    --pass-wash: #162A24;
+    --fail:      #E8837F;
+    --fail-wash: #2E1D1D;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.75);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 920px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ---------- 머리말 ---------- */
+  .top {
+    padding: 68px 0 32px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .kicker {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--token);
+    margin: 0 0 16px;
+  }
+  h1 {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: clamp(34px, 5.5vw, 54px);
+    line-height: 1.12;
+    letter-spacing: -.02em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .lede { font-size: 18px; color: var(--ink-soft); max-width: 64ch; margin: 0; }
+
+  /* ---------- 목차 바 ---------- */
+  nav.bar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+    padding: 10px 0;
+    overflow-x: auto;
+  }
+  nav.bar ol {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; gap: 4px; white-space: nowrap;
+  }
+  nav.bar a {
+    display: block;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 3px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  nav.bar a:hover, nav.bar a:focus-visible { color: var(--token); background: var(--token-wash); }
+
+  /* ---------- 섹션 ---------- */
+  section { padding-top: 60px; scroll-margin-top: 60px; }
+  h2 {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -.015em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .sub {
+    color: var(--muted); font-size: 15px; margin: 0 0 28px;
+    padding-bottom: 18px; border-bottom: 1px solid var(--rule);
+  }
+  h3 {
+    font-family: var(--f-display);
+    font-weight: 700; font-size: 19px;
+    margin: 40px 0 12px; letter-spacing: -.01em;
+  }
+  h4 { font-size: 15px; font-weight: 600; margin: 26px 0 8px; color: var(--ink-soft); }
+  p { margin: 0 0 16px; max-width: 68ch; }
+  ul, ol { max-width: 68ch; padding-left: 22px; margin: 0 0 18px; }
+  li { margin-bottom: 9px; }
+  li::marker { color: var(--muted); }
+  strong { font-weight: 600; }
+  a { color: var(--steel); text-underline-offset: 2px; }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: .875em;
+    background: var(--surface-2);
+    padding: 1px 5px; border-radius: 3px;
+  }
+
+  /* ---------- 코드 ---------- */
+  figure.code {
+    margin: 0 0 22px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  figure.code figcaption {
+    font-family: var(--f-mono); font-size: 12px;
+    padding: 9px 16px;
+    background: var(--rule-soft);
+    border-bottom: 1px solid var(--rule);
+    color: var(--muted);
+  }
+  figure.code pre {
+    margin: 0; padding: 16px; overflow-x: auto;
+    font-family: var(--f-mono); font-size: 13px; line-height: 1.75;
+    color: var(--ink-soft); tab-size: 2;
+  }
+  pre b { color: var(--token); font-weight: 500; }
+  pre em { color: var(--steel); font-style: normal; font-weight: 500; }
+  pre i { color: var(--muted); font-style: normal; }
+
+  /* ---------- 그림 ---------- */
+  figure.fig { margin: 0 0 26px; }
+  figure.fig .holder {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 22px 20px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  figure.fig svg { display: block; width: 100%; height: auto; min-width: 620px; }
+  figure.fig figcaption { font-size: 13.5px; color: var(--muted); margin-top: 11px; max-width: 68ch; }
+
+  .s-fill   { fill: var(--surface-2); }
+  .s-line   { stroke: var(--rule); }
+  .t-fill   { fill: var(--token-wash); }
+  .t-line   { stroke: var(--token); }
+  .st-fill  { fill: var(--steel-wash); }
+  .st-line  { stroke: var(--steel); }
+  .p-fill   { fill: var(--pass-wash); }
+  .p-line   { stroke: var(--pass); }
+  .f-fill   { fill: var(--fail-wash); }
+  .f-line   { stroke: var(--fail); }
+  text.lb   { fill: var(--ink); font-family: var(--f-body); font-size: 13px; font-weight: 500; }
+  text.sm   { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+  text.tk   { fill: var(--token); font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
+  text.dim  { fill: var(--muted); font-family: var(--f-body); font-size: 12px; }
+  .ar { stroke: var(--muted); fill: none; stroke-width: 1.4; }
+  .ar-t { stroke: var(--token); fill: none; stroke-width: 1.8; }
+
+  /* ---------- 표 ---------- */
+  .scroll {
+    overflow-x: auto; margin: 0 0 24px;
+    border: 1px solid var(--rule); border-radius: 6px; background: var(--surface);
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+    background: var(--rule-soft); border-bottom: 1px solid var(--rule); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { background: transparent; padding: 0; }
+
+  /* ---------- 단계 (요청 여정) ---------- */
+  ol.steps { list-style: none; padding: 0; counter-reset: s; max-width: 68ch; }
+  ol.steps > li {
+    counter-increment: s; position: relative;
+    padding-left: 46px; margin-bottom: 28px;
+  }
+  ol.steps > li::before {
+    content: counter(s, decimal-leading-zero);
+    position: absolute; left: 0; top: 3px;
+    font-family: var(--f-mono); font-size: 12px; font-weight: 500;
+    color: var(--token);
+    background: var(--token-wash);
+    border-radius: 3px;
+    padding: 3px 7px;
+  }
+  ol.steps h4 { margin: 0 0 6px; font-size: 15.5px; color: var(--ink); }
+  ol.steps p { margin-bottom: 10px; }
+
+  /* ---------- 콜아웃 ---------- */
+  .note {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--steel);
+    background: var(--surface);
+    padding: 15px 18px; border-radius: 0 5px 5px 0;
+    margin: 0 0 22px; font-size: 14.5px; max-width: 68ch;
+  }
+  .note.warn { border-left-color: var(--token); }
+  .note.bad  { border-left-color: var(--fail); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl {
+    display: block; font-family: var(--f-mono);
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--steel); margin-bottom: 6px;
+  }
+  .note.warn .lbl { color: var(--token); }
+  .note.bad .lbl  { color: var(--fail); }
+
+  /* ---------- Q&A ---------- */
+  .qa { border-top: 1px solid var(--rule); padding-top: 20px; margin-top: 8px; }
+  .qa > h4 {
+    font-family: var(--f-display); font-weight: 700;
+    font-size: 16.5px; color: var(--ink); margin: 0 0 8px;
+  }
+  .qa > h4::before { content: "Q. "; color: var(--token); font-family: var(--f-mono); font-size: 14px; }
+
+  .pill {
+    display: inline-block; font-family: var(--f-mono); font-size: 11px;
+    padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+  }
+  .pill.ok  { color: var(--pass); background: var(--pass-wash); }
+  .pill.no  { color: var(--fail); background: var(--fail-wash); }
+  .pill.tok { color: var(--token); background: var(--token-wash); }
+
+  footer.end {
+    margin-top: 76px; padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px; color: var(--muted);
+  }
+
+  :focus-visible { outline: 2px solid var(--token); outline-offset: 3px; border-radius: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @media (max-width: 700px) {
+    .page { padding: 0 18px 72px; }
+    .top { padding-top: 44px; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="top">
+    <p class="kicker">EmoLetter · Spring Security</p>
+    <h1>JWT 필터 체인 해부</h1>
+    <p class="lede">
+      토큰은 어디서 만들어지고, 어느 시점에 검사되고, 누가 최종적으로 거절하는가.
+      EmoLetter 백엔드의 실제 코드를 따라가며 요청 한 건의 여정을 끝까지 좇는다.
+    </p>
+  </header>
+
+  <nav class="bar">
+    <ol>
+      <li><a href="#why">왜 필터인가</a></li>
+      <li><a href="#tokens">토큰 두 개</a></li>
+      <li><a href="#make">토큰 만들기</a></li>
+      <li><a href="#login">로그인 흐름</a></li>
+      <li><a href="#cookie">왜 쿠키인가</a></li>
+      <li><a href="#chain">필터 체인</a></li>
+      <li><a href="#journey">요청의 여정</a></li>
+      <li><a href="#nojwt">토큰 없을 때</a></li>
+      <li><a href="#auth">인증 객체</a></li>
+      <li><a href="#verify">검증과 만료</a></li>
+      <li><a href="#refresh">재발급</a></li>
+      <li><a href="#confuse">헷갈리는 지점</a></li>
+      <li><a href="#todo">손볼 곳</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ===================== 왜 필터인가 ===================== -->
+    <section id="why">
+      <h2>왜 하필 필터인가</h2>
+      <p class="sub">컨트롤러가 아니라 그 앞에서 처리하는 이유</p>
+
+      <p>
+        모든 컨트롤러 메서드마다 “토큰 있나? 유효한가? 누구지?”를 적는다면 스무 번 반복하게 된다.
+        게다가 한 곳이라도 빠뜨리면 그게 곧 보안 구멍이다.
+      </p>
+      <p>
+        그래서 스프링 시큐리티는 요청이 컨트롤러에 닿기 <strong>전에</strong> 지나가는 필터들의 줄을 만들어 둔다.
+        우리가 만든 <code>TokenAuthenticationFilter</code>는 그 줄에 끼어들어
+        <strong>딱 한 가지 일만</strong> 한다.
+      </p>
+
+      <div class="note">
+        <span class="lbl">이 문서에서 가장 중요한 한 문장</span>
+        <p>
+          <strong>우리 필터는 아무도 막지 않는다.</strong>
+          토큰이 유효하면 “이 사람은 누구입니다”라는 쪽지를 붙여둘 뿐이고,
+          토큰이 없거나 틀렸으면 아무 쪽지도 안 붙이고 그냥 통과시킨다.
+          <em>막는 일은 한참 뒤의 다른 필터가 한다.</em>
+        </p>
+      </div>
+
+      <p>
+        이 구조를 모르면 “토큰이 틀렸는데 왜 필터가 401을 안 던지지?”에서 막힌다.
+        필터는 <strong>인증(누구인가)</strong>만 담당하고,
+        <strong>인가(들여보낼 것인가)</strong>는 뒤쪽의 <code>AuthorizationFilter</code>가 결정하기 때문이다.
+      </p>
+    </section>
+
+    <!-- ===================== 토큰 두 개 ===================== -->
+    <section id="tokens">
+      <h2>토큰이 두 개인 이유</h2>
+      <p class="sub">수명도 다르고, 사는 곳도 다르다</p>
+
+      <p>
+        JWT는 한 번 발급하면 서버가 회수할 수 없다. 서버가 아무것도 기억하지 않는 게 JWT의 장점인데,
+        그게 곧 “취소 불가”라는 단점이 된다. 그래서 <strong>짧게 사는 토큰</strong>으로 평소 요청을 처리하고,
+        <strong>길게 사는 토큰</strong>은 재발급 용도로만 쓰되 서버에도 사본을 남긴다.
+      </p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 720 300" role="img" aria-label="accessToken은 1시간짜리로 브라우저 localStorage에 저장되고, refreshToken은 24시간짜리로 httpOnly 쿠키와 Redis 양쪽에 저장된다">
+            <text x="10" y="20" class="sm">브라우저</text>
+            <line x1="0" y1="30" x2="720" y2="30" class="s-line" stroke-dasharray="3 3"/>
+
+            <rect x="10" y="46" width="300" height="76" rx="5" class="t-fill t-line" stroke-width="1.5"/>
+            <text x="26" y="72" class="lb">accessToken</text>
+            <text x="26" y="94" class="sm">localStorage · JS가 읽을 수 있음</text>
+            <text x="26" y="112" class="tk">수명 1시간</text>
+
+            <rect x="330" y="46" width="300" height="76" rx="5" class="st-fill st-line" stroke-width="1.5"/>
+            <text x="346" y="72" class="lb">refreshToken</text>
+            <text x="346" y="94" class="sm">httpOnly 쿠키 · JS가 못 읽음</text>
+            <text x="346" y="112" class="sm">수명 24시간</text>
+
+            <path d="M160 122 L160 190" class="ar-t" marker-end="url(#a1)"/>
+            <text x="170" y="160" class="tk">Authorization: Bearer</text>
+
+            <path d="M480 122 L480 190" class="ar" marker-end="url(#a1)"/>
+            <text x="490" y="160" class="sm">Cookie (자동 전송)</text>
+
+            <line x1="0" y1="205" x2="720" y2="205" class="s-line" stroke-dasharray="3 3"/>
+            <text x="10" y="222" class="sm">서버</text>
+
+            <rect x="10" y="234" width="300" height="52" rx="5" class="s-fill s-line" stroke-width="1.5"/>
+            <text x="26" y="256" class="lb">검증만 하고 버림</text>
+            <text x="26" y="276" class="sm">서버에 저장 안 함 (stateless)</text>
+
+            <rect x="330" y="234" width="300" height="52" rx="5" class="st-fill st-line" stroke-width="1.5"/>
+            <text x="346" y="256" class="lb">Redis에 사본 보관</text>
+            <text x="346" y="276" class="sm">key=userId · TTL 24시간</text>
+
+            <defs>
+              <marker id="a1" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          accessToken은 서버가 기억하지 않고 서명만 검사한다. refreshToken만 Redis에 사본을 두어
+          로그아웃 시 지울 수 있게 했다.
+        </figcaption>
+      </figure>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th></th><th>accessToken</th><th>refreshToken</th></tr></thead>
+          <tbody>
+            <tr><td>수명</td><td>1시간 <code>jwt.expiration.access</code></td><td>24시간 <code>jwt.expiration.refresh</code></td></tr>
+            <tr><td>클라이언트 저장</td><td><code>localStorage</code></td><td><code>httpOnly</code> 쿠키</td></tr>
+            <tr><td>JS 접근</td><td><span class="pill ok">가능</span></td><td><span class="pill no">불가</span></td></tr>
+            <tr><td>서버 저장</td><td><span class="pill no">안 함</span></td><td>Redis <code>@RedisHash</code></td></tr>
+            <tr><td>전송 방식</td><td><code>Authorization: Bearer</code> 헤더</td><td>브라우저가 쿠키로 자동 전송</td></tr>
+            <tr><td>쓰이는 곳</td><td>모든 API 요청</td><td><code>POST /api/token</code> 재발급만</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">refreshToken을 왜 Redis에 또 넣는가</span>
+        <p>
+          JWT만으로는 로그아웃을 구현할 수 없다. 이미 나간 토큰은 만료 전까지 유효하기 때문이다.
+          Redis에 사본을 두면 <strong>로그아웃 시 그 사본을 지워서</strong> 재발급을 막을 수 있다.
+          그래서 <code>createNewAccessToken</code>은 서명 검증만 하는 게 아니라
+          <strong>Redis에 저장된 값과 문자열이 일치하는지</strong>까지 대조한다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 토큰 만들기 ===================== -->
+    <section id="make">
+      <h2>토큰은 어떻게 만들어지는가</h2>
+      <p class="sub">TokenProvider.createToken — 두 토큰 모두 이 메서드 하나를 쓴다</p>
+
+      <p>
+        <code>createAccessToken</code>과 <code>createRefreshToken</code>은 하는 일이 같다.
+        <strong>유효기간만 다르게</strong> 넘겨서 같은 <code>createToken</code>을 부른다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/jwt/TokenProvider.java</figcaption>
+        <pre>public String createAccessToken(String userId, String role){
+    return createToken(userId, role, jwtProperties.getExpiration().<b>getAccess()</b>);   <i>// 3600000ms = 1시간</i>
+}
+public String createRefreshToken(String userId, String role){
+    return createToken(userId, role, jwtProperties.getExpiration().<b>getRefresh()</b>);  <i>// 86400000ms = 24시간</i>
+}
+
+private String createToken(String userId, String role, long expirationMillis){
+    Date now = new Date();
+    Date expiration = new Date(now.getTime() + expirationMillis);
+
+    return Jwts.builder()
+            .<b>setSubject(userId)</b>                <i>// sub — 나중에 principal.getName()이 되는 값</i>
+            .setIssuer(jwtProperties.getIssuer()) <i>// iss</i>
+            .<b>claim("role", role)</b>               <i>// 커스텀 클레임 — 권한 판단에 쓰임</i>
+            .setIssuedAt(now)                     <i>// iat</i>
+            .setExpiration(expiration)            <i>// exp — 이 시각이 지나면 파싱 단계에서 예외</i>
+            .<em>signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey().getBytes())</em>
+            .compact();
+}</pre>
+      </figure>
+
+      <p>
+        결과물은 점 두 개로 나뉜 문자열이다. <code>헤더.페이로드.서명</code> 형태이고,
+        앞의 두 조각은 <strong>암호화가 아니라 Base64 인코딩</strong>이라 누구나 열어볼 수 있다.
+      </p>
+
+      <figure class="code">
+        <figcaption>실제 토큰의 가운데 조각을 디코딩하면</figcaption>
+        <pre>{
+  "<b>sub</b>": "testuser1",        <i>// setSubject — 사용자 아이디</i>
+  "iss": "emoletter",         <i>// setIssuer</i>
+  "<b>role</b>": "ROLE_USER",       <i>// claim("role", ...)</i>
+  "iat": 1787900000,
+  "exp": 1787903600           <i>// iat + 3600초</i>
+}</pre>
+      </figure>
+
+      <div class="note bad">
+        <span class="lbl">그래서 토큰에 비밀을 담으면 안 된다</span>
+        <p>
+          비밀번호나 주민번호를 클레임에 넣으면 그대로 노출된다.
+          서명이 보장하는 건 “<strong>내용이 위조되지 않았다</strong>”이지 “내용이 감춰졌다”가 아니다.
+          지금 담긴 <code>sub</code>와 <code>role</code>은 공개돼도 무방한 값이라 괜찮다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 로그인 한 번 ===================== -->
+    <section id="login">
+      <h2>로그인 한 번에 무슨 일이 벌어지는가</h2>
+      <p class="sub">버튼을 누른 순간부터 토큰 두 장이 자리를 잡을 때까지, 파일과 함수 이름을 순서대로</p>
+
+      <p>
+        앞 절에서 토큰이 <em>무엇으로</em> 만들어지는지 봤다. 이제 그 함수들이
+        <strong>실제로 어떤 순서로 호출되는지</strong> 프런트의 폼 제출부터 끝까지 따라간다.
+        아래 이름은 전부 이 저장소에 있는 실제 파일과 메서드다.
+      </p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 470" role="img" aria-label="브라우저가 로그인 요청을 보내면 스프링이 MySQL에서 사용자를 찾아 비밀번호를 대조하고, accessToken과 refreshToken을 만들어 refreshToken은 Redis에 저장한 뒤, accessToken은 응답 본문으로 refreshToken은 Set-Cookie 헤더로 돌려준다">
+            <text x="70"  y="18" text-anchor="middle" class="sm">브라우저</text>
+            <text x="330" y="18" text-anchor="middle" class="sm">Spring</text>
+            <text x="565" y="18" text-anchor="middle" class="sm">MySQL</text>
+            <text x="700" y="18" text-anchor="middle" class="sm">Redis</text>
+            <line x1="70"  y1="26" x2="70"  y2="452" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="330" y1="26" x2="330" y2="452" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="565" y1="26" x2="565" y2="452" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="700" y1="26" x2="700" y2="452" class="s-line" stroke-dasharray="3 4"/>
+
+            <path d="M70 54 L323 54" class="ar" marker-end="url(#a5)"/>
+            <text x="80" y="48" class="sm">POST /api/user/login  { userId, password }</text>
+
+            <rect x="215" y="68" width="230" height="30" rx="4" class="s-fill s-line"/>
+            <text x="330" y="87" text-anchor="middle" class="sm">UserApiController.login()</text>
+
+            <path d="M330 122 L558 122" class="ar" marker-end="url(#a5)"/>
+            <text x="342" y="116" class="sm">userRepository.findById()</text>
+
+            <path d="M565 150 L337 150" class="ar" marker-end="url(#a5)"/>
+            <text x="352" y="144" class="sm">User (해시된 password)</text>
+
+            <rect x="215" y="164" width="230" height="30" rx="4" class="st-fill st-line"/>
+            <text x="330" y="183" text-anchor="middle" class="sm">passwordEncoder.matches()</text>
+
+            <rect x="200" y="212" width="260" height="30" rx="4" class="t-fill t-line"/>
+            <text x="330" y="231" text-anchor="middle" class="tk">createAccessToken()  ·  1시간</text>
+
+            <rect x="200" y="252" width="260" height="30" rx="4" class="t-fill t-line"/>
+            <text x="330" y="271" text-anchor="middle" class="tk">createRefreshToken()  ·  24시간</text>
+
+            <path d="M330 306 L693 306" class="ar-t" marker-end="url(#a5)"/>
+            <text x="342" y="300" class="tk">refreshTokenRepository.save()  ·  TTL 24h</text>
+
+            <path d="M330 344 L78 344" class="ar-t" marker-end="url(#a5)"/>
+            <text x="90" y="338" class="tk">200 OK  ·  body { accessToken }</text>
+
+            <path d="M330 376 L78 376" class="ar-t" marker-end="url(#a5)"/>
+            <text x="90" y="370" class="tk">Set-Cookie: refreshToken; HttpOnly</text>
+
+            <rect x="20" y="392" width="250" height="30" rx="4" class="p-fill p-line"/>
+            <text x="145" y="411" text-anchor="middle" class="sm">localStorage · accessToken</text>
+
+            <rect x="20" y="428" width="250" height="30" rx="4" class="s-fill s-line"/>
+            <text x="145" y="447" text-anchor="middle" class="sm">쿠키 저장소 · refreshToken</text>
+
+            <defs>
+              <marker id="a5" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          응답 한 번에 토큰 두 장이 <strong>서로 다른 통로로</strong> 나간다.
+          accessToken은 JSON 본문으로, refreshToken은 <code>Set-Cookie</code> 헤더로.
+          그래서 저장되는 장소도 다르다.
+        </figcaption>
+      </figure>
+
+      <h3>호출 순서 — 파일과 함수</h3>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>#</th><th>파일</th><th>함수</th><th>하는 일</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><code>FE components/auth/LoginModal.jsx</code></td><td><code>&lt;form onSubmit&gt;</code></td><td>제출 이벤트를 훅에 넘긴다</td></tr>
+            <tr><td>2</td><td><code>FE components/auth/useAuthForm.js</code></td><td><code>handleSubmit()</code></td><td><code>validateLogin()</code>으로 빈 값을 먼저 거른다</td></tr>
+            <tr><td>3</td><td><code>FE contexts/AuthContext.jsx</code></td><td><code>login()</code></td><td>API 호출과 상태 저장을 묶는다</td></tr>
+            <tr><td>4</td><td><code>FE api/authApi.js</code></td><td><code>login()</code></td><td>경로와 본문 모양만 정한다</td></tr>
+            <tr><td>5</td><td><code>FE api/http.js</code></td><td><code>request()</code></td><td><code>fetch</code> 실행 · <code>credentials:'include'</code></td></tr>
+            <tr><td colspan="4" style="text-align:center; color:var(--muted); font-family:var(--f-mono); font-size:11px;">— 네트워크 —</td></tr>
+            <tr><td>6</td><td><code>BE config/TokenAuthenticationFilter.java</code></td><td><code>doFilterInternal()</code></td><td>Authorization 헤더가 없다 → 아무것도 안 하고 통과</td></tr>
+            <tr><td>7</td><td><i>Spring 내장</i> <code>AuthorizationFilter</code></td><td><code>doFilter()</code></td><td>이 경로는 <code>permitAll</code> → 통과</td></tr>
+            <tr><td>8</td><td><code>BE controller/UserApiController.java</code></td><td><code>login()</code></td><td>전체 흐름을 지휘한다</td></tr>
+            <tr><td>9</td><td><code>BE service/UserService.java</code></td><td><code>login()</code></td><td>아이디 조회 + 비밀번호 대조</td></tr>
+            <tr><td>10</td><td><code>BE service/TokenService.java</code></td><td><code>createAccessTokenForLogin()</code></td><td>accessToken 발급 위임</td></tr>
+            <tr><td>11</td><td><code>BE config/jwt/TokenProvider.java</code></td><td><code>createAccessToken()</code> → <code>createToken()</code></td><td>서명된 문자열 생성 (1시간)</td></tr>
+            <tr><td>12</td><td><code>BE service/TokenService.java</code></td><td><code>createRefreshToken()</code></td><td>발급 + <strong>Redis 저장</strong></td></tr>
+            <tr><td>13</td><td><code>BE config/jwt/TokenProvider.java</code></td><td><code>createRefreshToken()</code> → <code>createToken()</code></td><td>서명된 문자열 생성 (24시간)</td></tr>
+            <tr><td>14</td><td><code>BE repository/RefreshTokenRepository.java</code></td><td><code>save()</code></td><td><code>@RedisHash</code>가 TTL 24시간을 걸어 저장</td></tr>
+            <tr><td>15</td><td><code>BE controller/UserApiController.java</code></td><td><code>ResponseCookie.from()</code></td><td>refreshToken을 httpOnly 쿠키로 포장</td></tr>
+            <tr><td colspan="4" style="text-align:center; color:var(--muted); font-family:var(--f-mono); font-size:11px;">— 응답 —</td></tr>
+            <tr><td>16</td><td><code>FE contexts/AuthContext.jsx</code></td><td><code>login()</code> 후반</td><td><code>setAccessToken(response.accessToken)</code></td></tr>
+            <tr><td>17</td><td><code>FE api/http.js</code></td><td><code>setAccessToken()</code></td><td>메모리 + <code>localStorage</code>에 저장</td></tr>
+            <tr><td>18</td><td><i>브라우저</i></td><td><code>Set-Cookie</code> 처리</td><td>refreshToken을 쿠키 저장소에 넣는다 (JS 접근 불가)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>단계별 코드</h3>
+
+      <ol class="steps">
+        <li>
+          <h4>프런트 — 폼에서 컨텍스트까지</h4>
+          <p>
+            컴포넌트는 화면만 그리고, 폼 상태와 제출은 훅이, 실제 호출은 컨텍스트가 맡는다.
+            컴포넌트가 <code>fetch</code>를 직접 부르는 곳은 이 프로젝트에 한 군데도 없다.
+          </p>
+          <figure class="code">
+            <figcaption>components/auth/useAuthForm.js</figcaption>
+            <pre>const handleSubmit = useCallback(async (event) =&gt; {
+    event.preventDefault();
+
+    <i>// 서버에 가기 전에 빈 값·형식부터 거른다</i>
+    const nextErrors = mode === 'login' ? validateLogin(values) : validateSignup(values);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length &gt; 0) return;
+
+    setSubmitting(true);
+    try {
+        if (mode === 'login') {
+            await <b>login</b>({ userId: values.userId.trim(), password: values.password });
+        }
+        ...
+    } catch (err) {
+        setSubmitError(err.message);   <i>// 서버가 준 문구를 그대로 띄운다</i>
+    } finally {
+        setSubmitting(false);
+    }
+}, [mode, values, login, signup, reset, onSuccess]);</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>프런트 — 요청을 실제로 쏘는 곳</h4>
+          <p>
+            <code>authApi.js</code>는 경로와 본문 모양만 정하고, 네트워크는 <code>http.js</code>가 전담한다.
+            여기서 <strong>두 가지</strong>가 중요하다.
+          </p>
+          <figure class="code">
+            <figcaption>api/authApi.js · api/http.js</figcaption>
+            <pre><i>// authApi.js — auth:false : 아직 토큰이 없으니 Authorization 헤더를 붙이지 않는다</i>
+export const login = ({ userId, password }) =&gt;
+  api.post('/user/login', { userId, password }, { <b>auth: false</b> });
+
+<i>// http.js — 모든 요청에 쿠키를 함께 보낸다.</i>
+<i>// 이게 없으면 서버가 내려준 refreshToken 쿠키가 다음 요청에 실리지 않는다.</i>
+response = await fetch(buildUrl(path, params), {
+    method, headers,
+    <b>credentials: 'include'</b>,
+    body: body === undefined ? undefined : JSON.stringify(body),
+});</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>백엔드 — 비밀번호 대조</h4>
+          <p>
+            DB에는 평문이 없다. 저장된 건 BCrypt 해시고, <code>matches()</code>가
+            입력값을 같은 방식으로 해시해 비교한다. 실패 시 <strong>아이디가 없든 비밀번호가 틀리든
+            같은 문구</strong>가 나가는 것도 여기서 정해진다.
+          </p>
+          <figure class="code">
+            <figcaption>service/UserService.java</figcaption>
+            <pre>public UserResponse login(String userId, String password) {
+    <i>// 아이디가 없을 때와 비밀번호가 틀릴 때 "같은" 문구를 내보낸다.</i>
+    <i>// 다르게 응답하면 아이디가 존재하는지 여부를 외부에서 알아낼 수 있다.</i>
+    User users = userRepository.findById(userId)
+            .orElseThrow(() -&gt; new InvalidCredentialsException(
+                    LOGIN_FAILED_MESSAGE, "로그인 실패 - 존재하지 않는 userId: " + userId));
+
+    if (!passwordEncoder.<b>matches</b>(password, users.getPassword())) {
+        throw new InvalidCredentialsException(
+                LOGIN_FAILED_MESSAGE, "로그인 실패 - 비밀번호 불일치: " + userId);
+    }
+
+    return UserResponse.builder()
+            .userId(users.getUserId()).email(users.getEmail())
+            .role(users.getRole()).nickName(users.getNickname())
+            .createAt(users.getCreateAt()).build();
+}</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>백엔드 — 토큰 두 장을 만들고 하나만 Redis에 남긴다</h4>
+          <p>
+            accessToken은 <strong>만들고 그냥 보낸다.</strong> 서버는 그 존재를 기억하지 않는다.
+            refreshToken만 Redis에 사본을 남기는데, 이 사본이 나중에
+            <em>“이 사용자가 아직 로그아웃하지 않았다”</em>는 증거로 쓰인다.
+          </p>
+          <figure class="code">
+            <figcaption>service/TokenService.java</figcaption>
+            <pre><i>// accessToken — 발급하고 끝. 서버에 흔적을 남기지 않는다.</i>
+public String createAccessTokenForLogin(String userId, String role) {
+    return tokenProvider.createAccessToken(userId, role);
+}
+
+<i>// refreshToken — 발급 + Redis에 사본 저장</i>
+@Transactional
+public String createRefreshToken(String userId, String role) {
+    String refreshToken = tokenProvider.createRefreshToken(userId, role);
+    <b>refreshTokenRepository.save(new RefreshToken(userId, refreshToken));</b>
+    return refreshToken;
+}</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>entity/RefreshToken.java — Redis 키 모양과 수명</figcaption>
+            <pre><i>// 1일 유지 (timeToLive는 초 단위) — 24시간 뒤 Redis가 알아서 지운다</i>
+@RedisHash(value = "refreshToken", <b>timeToLive = 60 * 60 * 24</b>)
+public class RefreshToken {
+    @Id
+    private String <b>userId</b>;        <i>// 이 필드가 Redis Key가 된다 → refreshToken:testuser1</i>
+
+    @Indexed
+    private String refreshToken;
+}</pre>
+          </figure>
+          <div class="note">
+            <span class="lbl">키가 userId라서 생기는 성질</span>
+            <p>
+              한 사용자당 사본이 <strong>딱 하나</strong>다. 다른 기기에서 다시 로그인하면
+              같은 키에 덮어써지고, 먼저 로그인한 기기의 refreshToken은
+              <code>createNewAccessToken()</code>의 문자열 대조에서 걸려 재발급이 막힌다.
+              의도한 동작이라면 “한 곳에서만 로그인”, 아니라면 키에 기기 식별자를 더해야 한다.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <h4>백엔드 — 응답을 두 갈래로 포장</h4>
+          <p>
+            같은 응답 안에서 accessToken은 <strong>본문</strong>에, refreshToken은
+            <strong>헤더</strong>에 실린다. 이 분리가 다음 절의 핵심이다.
+          </p>
+          <figure class="code">
+            <figcaption>controller/UserApiController.java</figcaption>
+            <pre>@PostMapping("/user/login")
+public ResponseEntity&lt;UserResponse&gt; login(@Valid @RequestBody LoginRequest loginRequest,
+                                          HttpServletResponse response) {
+    UserResponse userResponse = userService.login(loginRequest.getUserId(), loginRequest.getPassword());
+
+    String accessToken  = tokenService.createAccessTokenForLogin(userResponse.getUserId(), userResponse.getRole());
+    String refreshToken = tokenService.createRefreshToken(userResponse.getUserId(), userResponse.getRole());
+
+    userResponse.setAccessToken(accessToken);          <i>// ① 본문에 담는다 → JS가 읽는다</i>
+
+    ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+            .<b>httpOnly(true)</b>                            <i>// ② 쿠키에 담는다 → JS가 못 읽는다</i>
+            .path("/")
+            .maxAge(60 * 60 * 24)
+            .sameSite("Lax")
+            .secure(false)                             <i>// 로컬 http 테스트용. 배포 시 true</i>
+            .build();
+    response.addHeader("Set-Cookie", cookie.toString());
+
+    return ResponseEntity.ok().body(userResponse);
+}</pre>
+          </figure>
+          <div class="note warn">
+            <span class="lbl">코드에 <code>secure</code>가 두 번 있다</span>
+            <p>
+              현재 <code>.secure(true)</code>를 부른 뒤 아래에서 <code>.secure(false)</code>를 다시 부른다.
+              빌더는 <strong>나중 값이 이긴다</strong>. 실제 적용값은 <code>false</code>다.
+              로컬 <code>http://localhost</code>에서 쿠키를 받으려면 그래야 하지만,
+              배포할 때는 <strong>반드시 <code>true</code>로 되돌려야</strong> 한다.
+              그렇지 않으면 refreshToken이 암호화되지 않은 연결로도 전송된다.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <h4>프런트 — 받은 토큰을 자리에 앉힌다</h4>
+          <p>
+            accessToken은 명시적으로 저장하지만, refreshToken은 <strong>코드가 없다.</strong>
+            <code>Set-Cookie</code> 헤더를 본 브라우저가 알아서 넣기 때문이다.
+          </p>
+          <figure class="code">
+            <figcaption>contexts/AuthContext.jsx · api/http.js</figcaption>
+            <pre><i>// AuthContext.jsx</i>
+const login = useCallback(async ({ userId, password }) =&gt; {
+    const response = await authApi.login({ userId, password });
+    <b>setAccessToken(response?.accessToken);</b>       <i>// ← accessToken만 직접 저장</i>
+    const loggedInUser = authApi.toUser(response);
+    setUser(loggedInUser);
+    return loggedInUser;
+}, []);
+
+<i>// http.js — 메모리와 localStorage 양쪽에 둔다.</i>
+<i>// 메모리: 매 요청마다 localStorage를 읽지 않기 위해</i>
+<i>// localStorage: 새로고침해도 로그인이 풀리지 않기 위해</i>
+export const setAccessToken = (token) =&gt; {
+    accessToken = token || '';
+    if (accessToken) localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
+    else             localStorage.removeItem(TOKEN_STORAGE_KEY);
+};</pre>
+          </figure>
+        </li>
+      </ol>
+
+      <h3>결과: 토큰 두 장이 앉은 자리</h3>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th></th><th>accessToken</th><th>refreshToken</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>응답에서 오는 통로</td><td>JSON 본문</td><td><code>Set-Cookie</code> 헤더</td></tr>
+            <tr><td>브라우저 보관 장소</td><td><code>localStorage</code></td><td>쿠키 저장소 (httpOnly)</td></tr>
+            <tr><td>JS가 읽을 수 있나</td><td><span class="pill ok">읽는다</span></td><td><span class="pill no">못 읽는다</span></td></tr>
+            <tr><td>요청에 실리는 방법</td><td>코드가 직접 <code>Authorization</code> 헤더에</td><td>브라우저가 자동으로</td></tr>
+            <tr><td>서버에 사본이 있나</td><td><span class="pill no">없다</span></td><td><span class="pill ok">Redis에 있다</span></td></tr>
+            <tr><td>수명</td><td>1시간</td><td>24시간</td></tr>
+            <tr><td>쓰이는 곳</td><td>모든 API 요청</td><td><code>POST /api/token</code> 하나뿐</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== 왜 쿠키인가 ===================== -->
+    <section id="cookie">
+      <h2>refreshToken은 왜 쿠키에 담는가</h2>
+      <p class="sub">쿠키가 무엇인지부터, 세션·localStorage와 무엇이 다른지까지</p>
+
+      <h3>쿠키란 무엇인가</h3>
+      <p>
+        HTTP는 <strong>요청 하나하나가 서로를 모른다.</strong> 방금 로그인한 사람이 다음 요청을 보내도,
+        서버 입장에서는 처음 보는 요청이다. 이 “기억 없음”을 메우려고 나온 게 쿠키다.
+      </p>
+      <p>
+        동작은 단순하다. 서버가 응답에 <code>Set-Cookie: 이름=값</code>을 붙이면,
+        브라우저가 그 값을 <strong>도메인별로 보관</strong>했다가
+        <strong>같은 도메인으로 가는 요청마다 <code>Cookie:</code> 헤더에 자동으로 실어 보낸다.</strong>
+        개발자가 붙이는 코드를 쓰지 않는다는 점이 핵심이다.
+      </p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 250" role="img" aria-label="서버가 Set-Cookie 헤더로 값을 내려주면 브라우저가 쿠키 저장소에 보관하고, 이후 같은 도메인으로 가는 모든 요청에 Cookie 헤더를 자동으로 붙여 보낸다">
+            <text x="120" y="18" text-anchor="middle" class="sm">브라우저</text>
+            <text x="620" y="18" text-anchor="middle" class="sm">서버</text>
+            <line x1="120" y1="26" x2="120" y2="232" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="620" y1="26" x2="620" y2="232" class="s-line" stroke-dasharray="3 4"/>
+
+            <path d="M120 56 L613 56" class="ar" marker-end="url(#a6)"/>
+            <text x="132" y="50" class="sm">POST /api/user/login</text>
+
+            <path d="M620 92 L128 92" class="ar-t" marker-end="url(#a6)"/>
+            <text x="150" y="86" class="tk">Set-Cookie: refreshToken=eyJ...; HttpOnly; Path=/; Max-Age=86400</text>
+
+            <rect x="20" y="108" width="200" height="34" rx="4" class="p-fill p-line"/>
+            <text x="120" y="129" text-anchor="middle" class="sm">쿠키 저장소에 보관</text>
+            <text x="240" y="129" class="dim">개발자 코드 없음 — 브라우저가 한다</text>
+
+            <path d="M120 176 L613 176" class="ar-t" marker-end="url(#a6)"/>
+            <text x="132" y="170" class="tk">POST /api/token   Cookie: refreshToken=eyJ...</text>
+
+            <path d="M120 214 L613 214" class="ar" marker-end="url(#a6)"/>
+            <text x="132" y="208" class="sm">GET /api/diary    Cookie: refreshToken=eyJ...  (같은 도메인이면 무조건 따라간다)</text>
+
+            <defs>
+              <marker id="a6" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          쿠키의 성질은 <strong>자동 전송</strong>이다. 이게 장점이자(코드가 필요 없다)
+          단점이다(원치 않는 요청에도 따라간다 → CSRF).
+        </figcaption>
+      </figure>
+
+      <h3>쿠키에 붙는 속성들</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>속성</th><th>이 프로젝트 값</th><th>의미</th></tr></thead>
+          <tbody>
+            <tr><td><code>HttpOnly</code></td><td><span class="pill ok">true</span></td><td><strong>JS가 읽지도 쓰지도 못한다.</strong> <code>document.cookie</code>에 아예 나타나지 않는다</td></tr>
+            <tr><td><code>Secure</code></td><td><span class="pill tok">false (로컬)</span></td><td>true면 HTTPS 연결로만 전송된다. 배포 시 필수</td></tr>
+            <tr><td><code>SameSite</code></td><td><span class="pill ok">Lax</span></td><td>다른 사이트에서 시작된 요청에는 대체로 따라가지 않는다 → CSRF 완화</td></tr>
+            <tr><td><code>Path</code></td><td><code>/</code></td><td>이 경로 이하 모든 요청에 붙는다</td></tr>
+            <tr><td><code>Max-Age</code></td><td><code>86400</code></td><td>24시간 뒤 브라우저가 스스로 버린다 (Redis TTL과 같은 값)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>선택지가 셋 있었다</h3>
+      <p>
+        “로그인 상태를 어떻게 이어갈 것인가”에는 크게 세 갈래가 있다.
+        이 프로젝트는 <strong>둘을 섞어</strong> 쓴다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th></th><th>서버 세션</th><th>localStorage</th><th>httpOnly 쿠키</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>값을 들고 있는 쪽</td><td>서버 메모리/Redis<br><small>브라우저엔 세션 ID만</small></td><td>브라우저</td><td>브라우저</td></tr>
+            <tr><td>요청에 싣는 주체</td><td>브라우저 (자동)</td><td>내 코드 (수동)</td><td>브라우저 (자동)</td></tr>
+            <tr><td>JS가 값을 읽나</td><td>— (ID만 있고 그것도 httpOnly)</td><td><span class="pill no">읽는다</span></td><td><span class="pill ok">못 읽는다</span></td></tr>
+            <tr><td>XSS로 탈취되나</td><td><span class="pill ok">안 된다</span></td><td><span class="pill no">된다</span></td><td><span class="pill ok">안 된다</span></td></tr>
+            <tr><td>CSRF 위험</td><td><span class="pill no">있다</span></td><td><span class="pill ok">없다</span></td><td><span class="pill no">있다 → SameSite로 완화</span></td></tr>
+            <tr><td>서버 확장</td><td><span class="pill no">공유 저장소 필요</span></td><td><span class="pill ok">서버는 상태 없음</span></td><td><span class="pill ok">서버는 상태 없음</span></td></tr>
+            <tr><td>서버가 즉시 무효화</td><td><span class="pill ok">가능</span></td><td><span class="pill no">불가</span></td><td><span class="pill ok">사본을 두면 가능</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>그래서 왜 이렇게 나눴는가</h3>
+
+      <ol class="steps">
+        <li>
+          <h4>세션을 안 쓴 이유 — 서버가 상태를 갖지 않기로 했다</h4>
+          <p>
+            <code>WebSecurityConfig</code>에 <code>SessionCreationPolicy.STATELESS</code>가 있다.
+            세션 방식은 서버가 “누가 로그인했는지”를 기억해야 해서, 서버를 여러 대로 늘리면
+            세션을 공유할 저장소가 따로 필요하다. JWT는 토큰 안에 정보가 들어 있어
+            <strong>아무 서버나 받아도 검증만으로 끝난다.</strong>
+          </p>
+          <figure class="code">
+            <figcaption>config/WebSecurityConfig.java</figcaption>
+            <pre><i>// 세션 비활성화 (JWT 기반 인증)</i>
+<i>// JWT의 핵심은 서버가 클라이언트 상태(세션)를 저장하지 않는 것</i>
+.sessionManagement(session -&gt; session
+        .sessionCreationPolicy(<b>SessionCreationPolicy.STATELESS</b>)
+)</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>refreshToken을 localStorage에 두지 않은 이유 — 수명이 길어서</h4>
+          <p>
+            <code>localStorage</code>는 그 페이지에서 도는 <strong>모든 자바스크립트가 읽을 수 있다.</strong>
+            XSS가 한 번 뚫리면 <code>localStorage.getItem()</code> 한 줄로 값이 넘어간다.
+          </p>
+          <p>
+            둘 다 털렸다고 가정했을 때 피해가 다르다.
+            accessToken은 <strong>1시간이면 죽는다.</strong>
+            refreshToken은 <strong>24시간 동안 accessToken을 계속 찍어낼 수 있는 열쇠</strong>다.
+            그래서 더 위험한 쪽을 JS가 손댈 수 없는 곳에 넣었다.
+          </p>
+          <div class="note">
+            <span class="lbl">httpOnly는 무엇을 막아주나</span>
+            <p>
+              공격 스크립트가 refreshToken을 <strong>훔쳐 나갈 수는 없다.</strong>
+              다만 그 브라우저 안에서 <code>fetch('/api/token')</code>을 호출하는 건 여전히 가능하다.
+              httpOnly는 “값의 유출”을 막지, “그 브라우저에서의 오용”까지 막지는 않는다.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <h4>accessToken은 왜 localStorage에 뒀나 — 헤더로 보내야 해서</h4>
+          <p>
+            accessToken은 <code>Authorization: Bearer ...</code> 헤더에 실어야 하는데,
+            그러려면 <strong>JS가 값을 읽을 수 있어야 한다.</strong>
+            httpOnly 쿠키에 넣으면 읽을 수 없어 헤더를 만들 수가 없다.
+          </p>
+          <p>
+            그리고 헤더 방식은 <strong>자동으로 따라붙지 않는다.</strong>
+            다른 사이트가 우리 API로 요청을 만들어도 그 요청에는 <code>Authorization</code> 헤더가 없다.
+            즉 accessToken 쪽은 CSRF가 원천적으로 성립하지 않는다.
+          </p>
+          <figure class="code">
+            <figcaption>api/http.js — 붙이는 코드가 있어야만 붙는다</figcaption>
+            <pre>const token = getAccessToken();
+if (auth &amp;&amp; token) headers.<b>Authorization</b> = `Bearer ${token}`;</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>쿠키라서 CSRF가 열린다 — 두 겹으로 막았다</h4>
+          <p>
+            쿠키는 자동 전송이라, 다른 사이트가 <code>&lt;form action="우리주소/api/token"&gt;</code>을 만들어도
+            쿠키가 따라간다. 이걸 막는 게 <strong><code>SameSite=Lax</code></strong>다.
+            게다가 쿠키가 실제로 쓰이는 엔드포인트는 <code>POST /api/token</code>
+            <strong>하나뿐</strong>이고, 그 응답의 새 accessToken은 공격자가 읽을 수 없다.
+            <em>(다른 오리진의 응답 본문은 브라우저가 읽지 못하게 막는다.)</em>
+          </p>
+          <div class="note warn">
+            <span class="lbl">CSRF를 껐다는 사실</span>
+            <p>
+              <code>.csrf(csrf -&gt; csrf.disable())</code>이 들어 있다.
+              대부분의 API가 헤더 인증이라 문제가 없지만,
+              <strong>쿠키를 쓰는 <code>/api/token</code>과 <code>/api/user/logout</code>만은</strong>
+              <code>SameSite</code>에 전적으로 기대고 있다는 뜻이다.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <h4>Redis 사본 — 쿠키만으로는 부족한 부분</h4>
+          <p>
+            JWT는 서명만 맞으면 통과라, 발급 후에는 서버가 취소할 방법이 없다.
+            그래서 refreshToken만큼은 <strong>Redis에 사본을 두고</strong>
+            재발급 때 문자열까지 대조한다. 세션 방식의 장점(서버가 끊을 수 있음)을
+            <em>긴 수명 토큰 하나에만</em> 빌려온 절충이다.
+          </p>
+          <p>
+            로그아웃이 하는 일이 정확히 이 사본을 지우는 것이다.
+            사본이 없으면 <code>createNewAccessToken()</code>이 즉시 401을 던진다.
+          </p>
+        </li>
+      </ol>
+
+      <div class="note">
+        <span class="lbl">한 문장 요약</span>
+        <p>
+          <strong>짧게 살고 자주 쓰는 것은 헤더로(localStorage), 길게 살고 드물게 쓰는 것은 쿠키로(httpOnly).</strong>
+          그리고 길게 사는 쪽만 서버에 사본을 남겨 끊을 수 있게 했다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 필터 체인 ===================== -->
+    <section id="chain">
+      <h2>필터 체인의 실제 순서</h2>
+      <p class="sub">우리 필터가 어디에 끼어드는지, 그리고 누가 최종 결정을 하는지</p>
+
+      <p>
+        설정 코드는 이렇게 한 줄이다. “<code>UsernamePasswordAuthenticationFilter</code> <strong>앞에</strong> 넣어라”는 뜻인데,
+        정작 그 필터는 폼 로그인용이라 우리는 쓰지도 않는다. 그저 <strong>줄에서의 위치를 지정하는 기준점</strong>으로 쓴 것이다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/WebSecurityConfig.java</figcaption>
+        <pre>http.<b>addFilterBefore</b>(
+        new TokenAuthenticationFilter(tokenProvider),  <i>// 우리 필터</i>
+        UsernamePasswordAuthenticationFilter.class     <i>// 이것보다 앞에 놓아라</i>
+);</pre>
+      </figure>
+
+      <p>
+        말로만 보면 감이 안 오니, 서버가 기동할 때 로그에 직접 찍어주는 <strong>실제 줄 순서</strong>를 그렸다.
+        아래 13개가 EmoLetter에 실제로 걸려 있는 필터 전부다.
+      </p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 500" role="img" aria-label="13개 필터의 실제 실행 순서. TokenAuthenticationFilter는 7번째로 인증만 설정하고, 10번째 AnonymousAuthenticationFilter가 빈자리를 익명으로 채우며, 13번째 AuthorizationFilter가 최종 거절을 결정한다">
+            <text x="8" y="16" class="sm">요청 진입</text>
+            <path d="M60 22 L60 36" class="ar" marker-end="url(#a2)"/>
+
+            <rect x="8" y="40" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="55" class="dim">1 · DisableEncodeUrlFilter</text>
+            <rect x="8" y="66" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="81" class="dim">2 · WebAsyncManagerIntegrationFilter</text>
+            <rect x="8" y="92" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="107" class="dim">3 · SecurityContextHolderFilter</text>
+            <rect x="8" y="118" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="133" class="dim">4 · HeaderWriterFilter</text>
+
+            <rect x="8" y="144" width="330" height="22" rx="3" class="st-fill st-line"/>
+            <text x="18" y="159" class="lb">5 · CorsFilter</text>
+            <text x="350" y="159" class="sm">preflight를 여기서 끝냄</text>
+
+            <rect x="8" y="170" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="185" class="dim">6 · LogoutFilter</text>
+
+            <rect x="6" y="196" width="334" height="30" rx="4" class="t-fill t-line" stroke-width="2"/>
+            <text x="18" y="216" class="lb">7 · TokenAuthenticationFilter</text>
+            <text x="350" y="210" class="tk">여기서 토큰을 읽는다</text>
+            <text x="350" y="226" class="sm">유효하면 SecurityContext에 인증을 넣음</text>
+
+            <rect x="8" y="230" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="245" class="dim">8 · RequestCacheAwareFilter</text>
+            <rect x="8" y="256" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="271" class="dim">9 · SecurityContextHolderAwareRequestFilter</text>
+
+            <rect x="8" y="282" width="330" height="22" rx="3" class="st-fill st-line"/>
+            <text x="18" y="297" class="lb">10 · AnonymousAuthenticationFilter</text>
+            <text x="350" y="297" class="sm">비어 있으면 &quot;익명&quot;으로 채움</text>
+
+            <rect x="8" y="308" width="330" height="22" rx="3" class="s-fill s-line"/>
+            <text x="18" y="323" class="dim">11 · SessionManagementFilter</text>
+
+            <rect x="8" y="334" width="330" height="22" rx="3" class="f-fill f-line"/>
+            <text x="18" y="349" class="lb">12 · ExceptionTranslationFilter</text>
+            <text x="350" y="349" class="sm">거절을 401 응답으로 번역</text>
+
+            <rect x="6" y="360" width="334" height="30" rx="4" class="f-fill f-line" stroke-width="2"/>
+            <text x="18" y="380" class="lb">13 · AuthorizationFilter</text>
+            <text x="350" y="374" class="sm">실제로 막는 곳</text>
+            <text x="350" y="390" class="sm">익명이면 여기서 거절</text>
+
+            <path d="M172 392 L172 414" class="ar" marker-end="url(#a2)"/>
+            <rect x="8" y="418" width="330" height="30" rx="4" class="p-fill p-line" stroke-width="1.5"/>
+            <text x="18" y="438" class="lb">DispatcherServlet → 컨트롤러</text>
+
+            <path d="M348 375 C 420 375, 430 470, 360 470" class="ar" marker-end="url(#a2)"/>
+            <text x="368" y="474" class="sm">거절 시 12번으로 되돌아가 401</text>
+
+            <defs>
+              <marker id="a2" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          우리 필터(7번)는 인증을 <strong>설정</strong>만 하고, 거절은 13번이 한다.
+          7번에서 아무것도 못 넣으면 10번이 “익명”으로 채우고, 13번이 그 익명을 보고 막는다.
+        </figcaption>
+      </figure>
+
+      <div class="note warn">
+        <span class="lbl">7번과 13번 사이가 핵심</span>
+        <p>
+          토큰이 틀렸을 때 7번은 <strong>조용히 지나간다.</strong> 예외도 안 던지고 응답도 안 만든다.
+          그 결과 10번이 익명 사용자로 채우고, 13번이 <code>anyRequest().authenticated()</code> 규칙에 걸려 거절하며,
+          12번이 그 거절을 401 응답으로 바꾼다. <strong>401을 만드는 건 12번</strong>이지 우리 필터가 아니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 요청의 여정 ===================== -->
+    <section id="journey">
+      <h2>요청 한 건의 여정</h2>
+      <p class="sub"><code>GET /api/diary</code> 하나가 통과하거나 거절당하기까지</p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 380" role="img" aria-label="토큰이 유효하면 SecurityContext에 인증이 채워져 컨트롤러까지 도달하고, 없거나 무효하면 익명 상태로 AuthorizationFilter에서 거절돼 401이 반환된다">
+            <rect x="250" y="8" width="250" height="40" rx="5" class="s-fill s-line" stroke-width="1.5"/>
+            <text x="375" y="33" text-anchor="middle" class="lb">GET /api/diary</text>
+
+            <path d="M375 48 L375 74" class="ar" marker-end="url(#a3)"/>
+
+            <rect x="230" y="78" width="290" height="46" rx="5" class="t-fill t-line" stroke-width="2"/>
+            <text x="375" y="98" text-anchor="middle" class="lb">TokenAuthenticationFilter</text>
+            <text x="375" y="116" text-anchor="middle" class="sm">Authorization 헤더에서 토큰 추출 → 검증</text>
+
+            <path d="M300 124 L150 168" class="ar-t" marker-end="url(#a3)"/>
+            <text x="120" y="150" class="tk">유효</text>
+
+            <path d="M450 124 L600 168" class="ar" marker-end="url(#a3)"/>
+            <text x="560" y="150" class="sm">없음 / 무효 / 만료</text>
+
+            <rect x="20" y="172" width="270" height="46" rx="5" class="p-fill p-line" stroke-width="1.5"/>
+            <text x="155" y="192" text-anchor="middle" class="lb">SecurityContext에 인증 저장</text>
+            <text x="155" y="210" text-anchor="middle" class="sm">principal = userId, authorities = ROLE_USER</text>
+
+            <rect x="470" y="172" width="270" height="46" rx="5" class="s-fill s-line" stroke-width="1.5"/>
+            <text x="605" y="192" text-anchor="middle" class="lb">아무것도 안 함</text>
+            <text x="605" y="210" text-anchor="middle" class="sm">→ 10번 필터가 익명으로 채움</text>
+
+            <path d="M155 218 L155 250" class="ar" marker-end="url(#a3)"/>
+            <path d="M605 218 L605 250" class="ar" marker-end="url(#a3)"/>
+
+            <rect x="250" y="254" width="250" height="34" rx="5" class="f-fill f-line" stroke-width="1.5"/>
+            <text x="375" y="276" text-anchor="middle" class="lb">AuthorizationFilter</text>
+            <path d="M155 250 L262 256" class="ar"/>
+            <path d="M605 250 L490 256" class="ar"/>
+
+            <path d="M300 288 L155 322" class="ar" marker-end="url(#a3)"/>
+            <text x="150" y="308" class="sm">인증됨 → 통과</text>
+            <path d="M450 288 L600 322" class="ar" marker-end="url(#a3)"/>
+            <text x="520" y="308" class="sm">익명 → 거절</text>
+
+            <rect x="20" y="326" width="270" height="42" rx="5" class="p-fill p-line" stroke-width="1.5"/>
+            <text x="155" y="345" text-anchor="middle" class="lb">DiaryController</text>
+            <text x="155" y="362" text-anchor="middle" class="sm">principal.getName() = &quot;testuser1&quot;</text>
+
+            <rect x="470" y="326" width="270" height="42" rx="5" class="f-fill f-line" stroke-width="1.5"/>
+            <text x="605" y="345" text-anchor="middle" class="lb">401 Unauthorized</text>
+            <text x="605" y="362" text-anchor="middle" class="sm">ExceptionTranslationFilter가 생성</text>
+
+            <defs>
+              <marker id="a3" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          갈림길은 하나뿐이다 — SecurityContext가 채워졌는가. 그 판단은 필터가 하지만,
+          그에 따른 처분은 두 단계 뒤에서 일어난다.
+        </figcaption>
+      </figure>
+
+      <ol class="steps">
+        <li>
+          <h4>헤더에서 토큰 꺼내기</h4>
+          <p>
+            <code>Bearer </code> 접두사를 떼어낸다. 헤더가 없거나 접두사가 다르면 <code>null</code>을 반환한다.
+            <strong>여기서 예외를 던지지 않는 게 중요하다</strong> — 로그인·회원가입처럼 토큰이 없는 게 정상인 요청도
+            이 필터를 지나가기 때문이다.
+          </p>
+          <figure class="code">
+            <figcaption>config/TokenAuthenticationFilter.java</figcaption>
+            <pre>private String getAccessToken(String authorizationHeader) {
+    if (authorizationHeader != null &amp;&amp; authorizationHeader.startsWith(<b>"Bearer "</b>)) {
+        return authorizationHeader.substring("Bearer ".length());
+    }
+    return <b>null</b>;   <i>// 토큰이 없어도 예외가 아니다</i>
+}</pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>유효하면 인증 객체를 만들어 넣기</h4>
+          <p>
+            <code>validateToken</code>이 <code>true</code>면 토큰에서 인증 객체를 만들어
+            <code>SecurityContextHolder</code>에 담는다. 이게 앞서 말한 “쪽지 붙이기”다.
+          </p>
+          <figure class="code">
+            <figcaption>doFilterInternal의 핵심 3줄</figcaption>
+            <pre>String token = getAccessToken(request.getHeader("Authorization"));
+
+if (tokenProvider.<b>validateToken(token)</b>) {
+    Authentication auth = tokenProvider.getAuthentication(token);
+    <b>SecurityContextHolder.getContext().setAuthentication(auth);</b>
+}
+
+<em>filterChain.doFilter(request, response);</em>   <i>// 유효하든 아니든 무조건 다음 필터로</i></pre>
+          </figure>
+        </li>
+
+        <li>
+          <h4>다음 필터로 넘기기</h4>
+          <p>
+            <code>filterChain.doFilter()</code>는 <strong>if 바깥</strong>에 있다.
+            토큰이 틀려도 요청은 계속 흘러간다. 이 한 줄이 “필터는 막지 않는다”의 실체다.
+          </p>
+        </li>
+
+        <li>
+          <h4>비어 있으면 익명으로 채워짐</h4>
+          <p>
+            10번 <code>AnonymousAuthenticationFilter</code>가 SecurityContext를 확인하고,
+            비어 있으면 <code>AnonymousAuthenticationToken</code>을 넣는다.
+            그래서 <strong>“인증 없음” 상태는 실제로는 “익명으로 인증됨” 상태</strong>다.
+          </p>
+        </li>
+
+        <li>
+          <h4>규칙에 비추어 거절 여부 결정</h4>
+          <p>
+            13번 <code>AuthorizationFilter</code>가 <code>authorizeHttpRequests</code> 규칙과 대조한다.
+            <code>/api/diary</code>는 <code>anyRequest().authenticated()</code>에 걸리는데
+            익명은 인증된 것으로 치지 않으므로 <code>AccessDeniedException</code>이 난다.
+          </p>
+        </li>
+
+        <li>
+          <h4>거절을 응답으로 번역</h4>
+          <p>
+            12번 <code>ExceptionTranslationFilter</code>가 그 예외를 잡는다.
+            익명 사용자였다면 “로그인부터 하라”는 뜻이므로 <strong>AuthenticationEntryPoint</strong>를 호출한다.
+            우리는 그걸 401로 지정해 두었다.
+          </p>
+          <figure class="code">
+            <figcaption>config/WebSecurityConfig.java</figcaption>
+            <pre>.exceptionHandling(ex -&gt; ex
+        .authenticationEntryPoint(new <b>HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)</b>)
+)</pre>
+          </figure>
+          <p>
+            이 설정이 없으면 스프링 기본값인 <code>Http403ForbiddenEntryPoint</code>가 쓰여
+            <strong>403</strong>이 나간다. 프런트가 “토큰 만료”와 “권한 없음”을 구분하지 못하게 되는 원인이었다.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===================== 토큰이 없을 때 ===================== -->
+    <section id="nojwt">
+      <h2>토큰이 없는 요청도 필터를 전부 지난다</h2>
+      <p class="sub">“JWT가 없으면 시큐리티가 안 도는 거 아닌가요?”에 대한 답</p>
+
+      <p>
+        아니다. <strong>필터 체인은 요청의 내용과 무관하게 항상 돈다.</strong>
+        스프링 시큐리티는 서블릿 컨테이너에
+        <code>springSecurityFilterChain</code>이라는 필터를 하나 등록해 두는데,
+        이건 <strong>URL 패턴에 걸린 모든 요청</strong>이 통과하는 관문이다.
+        토큰이 있든 없든, 로그인 API든 일기 조회든 전부 여기를 지난다.
+      </p>
+
+      <p>
+        헷갈리기 쉬운 건 <code>permitAll</code>이다. 이건 <em>“필터를 건너뛴다”</em>가 아니라
+        <strong>“끝까지 다 지나가되 마지막 관문에서 통과시킨다”</strong>는 뜻이다.
+        13개 필터를 전부 지나고 <code>AuthorizationFilter</code>에서 “이 경로는 허용”이라 판정될 뿐이다.
+      </p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 330" role="img" aria-label="토큰이 없는 요청도 필터 체인 전체를 지나며, 토큰 필터는 아무 일도 하지 않고 익명 인증 필터가 anonymousUser를 채운 뒤, permitAll 경로면 통과하고 인증이 필요한 경로면 401이 된다">
+            <rect x="18" y="34" width="150" height="46" rx="5" class="s-fill s-line"/>
+            <text x="93" y="55" text-anchor="middle" class="lb">요청 도착</text>
+            <text x="93" y="72" text-anchor="middle" class="sm">Authorization 없음</text>
+
+            <path d="M172 57 L212 57" class="ar" marker-end="url(#a7)"/>
+
+            <rect x="216" y="34" width="180" height="46" rx="5" class="t-fill t-line"/>
+            <text x="306" y="54" text-anchor="middle" class="lb">7. Token 필터</text>
+            <text x="306" y="71" text-anchor="middle" class="tk">token == null → 아무것도 안 함</text>
+
+            <path d="M400 57 L440 57" class="ar" marker-end="url(#a7)"/>
+
+            <rect x="444" y="34" width="200" height="46" rx="5" class="st-fill st-line"/>
+            <text x="544" y="54" text-anchor="middle" class="lb">10. Anonymous 필터</text>
+            <text x="544" y="71" text-anchor="middle" class="sm">anonymousUser 채움</text>
+
+            <path d="M544 84 L544 118" class="ar" marker-end="url(#a7)"/>
+            <path d="M544 118 L306 118 L306 140" class="ar" marker-end="url(#a7)"/>
+
+            <rect x="196" y="144" width="220" height="46" rx="5" class="s-fill s-line"/>
+            <text x="306" y="164" text-anchor="middle" class="lb">13. Authorization 필터</text>
+            <text x="306" y="181" text-anchor="middle" class="sm">이 경로가 permitAll인가?</text>
+
+            <path d="M196 167 L120 167 L120 214" class="ar" marker-end="url(#a7)"/>
+            <text x="126" y="205" class="sm">예</text>
+
+            <path d="M416 167 L500 167 L500 214" class="ar" marker-end="url(#a7)"/>
+            <text x="506" y="205" class="sm">아니오</text>
+
+            <rect x="24" y="218" width="192" height="46" rx="5" class="p-fill p-line"/>
+            <text x="120" y="238" text-anchor="middle" class="lb">컨트롤러 도착</text>
+            <text x="120" y="255" text-anchor="middle" class="sm">로그인 · 회원가입 · /api/token</text>
+
+            <rect x="404" y="218" width="192" height="46" rx="5" class="f-fill f-line"/>
+            <text x="500" y="238" text-anchor="middle" class="lb">AccessDeniedException</text>
+            <text x="500" y="255" text-anchor="middle" class="sm">12번 필터가 받아낸다</text>
+
+            <path d="M500 268 L500 292" class="ar" marker-end="url(#a7)"/>
+            <rect x="404" y="296" width="192" height="30" rx="5" class="f-fill f-line"/>
+            <text x="500" y="315" text-anchor="middle" class="sm">401 Unauthorized</text>
+
+            <defs>
+              <marker id="a7" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          토큰이 없어도 7번 필터는 <strong>실행된다.</strong> 다만 할 일이 없어 그냥 통과할 뿐이다.
+          갈림길은 훨씬 뒤인 13번에서 갈린다.
+        </figcaption>
+      </figure>
+
+      <h3>토큰이 없으면 7번 필터 안에서 무슨 일이 일어나나</h3>
+      <p>
+        <code>getAccessToken()</code>이 <code>null</code>을 돌려주고,
+        <code>validateToken(null)</code>은 예외를 잡아 <code>false</code>를 반환한다.
+        <code>if</code> 블록에 들어가지 않으니 <code>SecurityContext</code>는 비어 있는 채로 남고,
+        <strong><code>filterChain.doFilter()</code>는 <code>if</code> 바깥에 있으므로 무조건 실행된다.</strong>
+      </p>
+
+      <figure class="code">
+        <figcaption>config/TokenAuthenticationFilter.java</figcaption>
+        <pre>String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
+String token = getAccessToken(authorizationHeader);   <i>// 헤더가 없으면 null</i>
+
+if (tokenProvider.validateToken(token)) {             <i>// null → false</i>
+    Authentication auth = tokenProvider.getAuthentication(token);
+    SecurityContextHolder.getContext().setAuthentication(auth);
+}
+<i>// ↑ 들어가지 않았다. SecurityContext는 비어 있다.</i>
+
+<b>filterChain.doFilter(request, response);</b>          <i>// ← if 밖. 무조건 다음 필터로 넘어간다.</i></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>config/jwt/TokenProvider.java — null이 예외로 흡수되는 경로</figcaption>
+        <pre>public boolean validateToken(String token){
+    try{
+        getClaims(token);        <i>// null이면 jjwt가 IllegalArgumentException을 던진다</i>
+        return true;
+    } catch (RuntimeException e){
+        System.out.println("토큰 유효성 검사 실패: " + e.getMessage());
+        return <b>false</b>;
+    }
+}</pre>
+      </figure>
+
+      <div class="note warn">
+        <span class="lbl">부작용 — 로그가 시끄럽다</span>
+        <p>
+          이 구조 때문에 <strong>로그인·회원가입처럼 토큰이 없는 게 정상인 요청에서도</strong>
+          “토큰 유효성 검사 실패” 가 매번 찍힌다. 오류가 아니라 정상 동작인데 오류처럼 보인다.
+          <code>token == null</code>이면 검증을 건너뛰도록 앞에서 한 번 걸러주면 사라진다.
+        </p>
+      </div>
+
+      <h3>비어 있는 인증을 누가 채우나</h3>
+      <p>
+        <code>SecurityContext</code>가 비어 있으면 뒤쪽 필터들이 <code>null</code> 처리를 따로 해야 한다.
+        그래서 스프링은 10번 <code>AnonymousAuthenticationFilter</code>에서
+        <strong>“익명 사용자”라는 가짜 인증 객체를 대신 채워 넣는다.</strong>
+        덕분에 <code>AuthorizationFilter</code>는 언제나 인증 객체가 있다고 가정하고 짤 수 있다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th></th><th>토큰 없음</th><th>유효한 토큰</th></tr></thead>
+          <tbody>
+            <tr><td>7번 필터 실행</td><td><span class="pill ok">실행됨</span></td><td><span class="pill ok">실행됨</span></td></tr>
+            <tr><td>7번 필터가 한 일</td><td>없음</td><td><code>setAuthentication()</code></td></tr>
+            <tr><td>10번 이후 principal</td><td><code>"anonymousUser"</code></td><td><code>User(userId, …)</code></td></tr>
+            <tr><td>권한</td><td><code>ROLE_ANONYMOUS</code></td><td><code>USER</code> (클레임의 role)</td></tr>
+            <tr><td><code>isAuthenticated()</code></td><td><span class="pill tok">true지만 익명</span></td><td><span class="pill ok">true</span></td></tr>
+            <tr><td><code>permitAll</code> 경로</td><td><span class="pill ok">통과</span></td><td><span class="pill ok">통과</span></td></tr>
+            <tr><td><code>authenticated()</code> 경로</td><td><span class="pill no">401</span></td><td><span class="pill ok">통과</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">401과 403은 여기서 갈린다</span>
+        <p>
+          12번 <code>ExceptionTranslationFilter</code>가 거부를 받아낸 뒤,
+          <strong>인증 객체가 익명이면</strong> “아직 로그인을 안 했구나”로 보고
+          <code>AuthenticationEntryPoint</code>를 불러 <span class="pill no">401</span>을 만든다.
+          <strong>제대로 로그인한 사용자인데 권한이 모자란 경우</strong>에만
+          <span class="pill no">403</span>이 나간다. 이 프로젝트는 역할 구분이 없어 사실상 401만 본다.
+        </p>
+      </div>
+
+      <h3>정말로 필터를 건너뛰는 경로는 따로 있다</h3>
+      <p>
+        <code>permitAll</code>은 통과일 뿐 우회가 아니라고 했다.
+        <strong>진짜로 체인 자체를 타지 않는</strong> 설정은 <code>WebSecurityCustomizer.ignoring()</code>이다.
+        이 프로젝트에는 정적 파일 한 줄만 걸려 있다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/WebSecurityConfig.java</figcaption>
+        <pre><i>// 스프링 시큐리티 기능 비활성화</i>
+@Bean
+public WebSecurityCustomizer configure(){
+    return (web) -&gt; web.<b>ignoring</b>()
+            .requestMatchers(new AntPathRequestMatcher("/static/**"));
+    <i>// CSS, JavaScript, 이미지 파일 등의 정적(static) 파일은 보안 비활성화</i>
+}</pre>
+      </figure>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th></th><th><code>ignoring()</code></th><th><code>permitAll()</code></th></tr></thead>
+          <tbody>
+            <tr><td>필터 체인을 지나나</td><td><span class="pill no">아예 안 지난다</span></td><td><span class="pill ok">전부 지난다</span></td></tr>
+            <tr><td>SecurityContext</td><td>만들어지지 않는다</td><td>익명으로 채워진다</td></tr>
+            <tr><td>토큰이 있으면</td><td>읽지도 않는다</td><td>읽고 인증까지 세팅한다</td></tr>
+            <tr><td>쓰는 곳</td><td>인증과 무관한 정적 자원</td><td>로그인·회원가입 같은 <strong>API</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note bad">
+        <span class="lbl">API를 <code>ignoring()</code>에 넣으면 안 된다</span>
+        <p>
+          체인을 안 타면 CORS 처리도, 예외 변환도, 헤더 보안도 전부 빠진다.
+          게다가 <strong>토큰을 보내도 인증 객체가 만들어지지 않아</strong>
+          컨트롤러의 <code>Principal</code>이 <code>null</code>이 된다.
+          API는 항상 <code>permitAll</code>을 쓴다.
+        </p>
+      </div>
+
+      <h3>이 프로젝트에서 토큰 없이 통과하는 경로</h3>
+      <figure class="code">
+        <figcaption>config/WebSecurityConfig.java</figcaption>
+        <pre>.authorizeHttpRequests(auth -&gt; auth
+        .requestMatchers(HttpMethod.POST,   "/api/user")        .permitAll()  <i>// 회원가입</i>
+        .requestMatchers(HttpMethod.POST,   "/api/user/login")  .permitAll()  <i>// 로그인</i>
+        .requestMatchers(HttpMethod.POST,   "/api/token")       .permitAll()  <i>// 재발급(쿠키로 인증)</i>
+        .requestMatchers(HttpMethod.DELETE, "/api/user/logout") .permitAll()  <i>// 로그아웃(쿠키로 인증)</i>
+        .requestMatchers(HttpMethod.GET,    "/api/health")      .permitAll()  <i>// 헬스체크</i>
+        .requestMatchers("/error")                              .permitAll()  <i>// 오류 재디스패치</i>
+        .anyRequest().<b>authenticated</b>()                                     <i>// 나머지 전부</i>
+);</pre>
+      </figure>
+      <p>
+        <code>/api/token</code>과 <code>/api/user/logout</code>이 <code>permitAll</code>인 건
+        <strong>보호를 포기한 게 아니다.</strong> 이 둘은 헤더의 accessToken이 아니라
+        <strong>쿠키의 refreshToken</strong>으로 신원을 확인하기 때문에,
+        헤더 기준으로 판정하는 시큐리티에게는 “인증 없이 들어오는 요청”으로 보일 수밖에 없다.
+        실제 검사는 컨트롤러 안쪽의 <code>createNewAccessToken()</code>이 한다.
+      </p>
+    </section>
+
+    <!-- ===================== 인증 객체 ===================== -->
+    <section id="auth">
+      <h2>인증 객체는 무엇으로 만들어지는가</h2>
+      <p class="sub">DB를 한 번도 안 본다</p>
+
+      <p>
+        <code>getAuthentication</code>은 <strong>토큰 안의 클레임만으로</strong> 인증 객체를 조립한다.
+        사용자 테이블을 조회하지 않는다. 이게 JWT가 빠른 이유이자,
+        <code>UserDetailService</code>가 로그인 때 말고는 거의 쓰이지 않는 이유다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/jwt/TokenProvider.java</figcaption>
+        <pre>public UsernamePasswordAuthenticationToken getAuthentication(String token){
+    Claims claims = getClaims(token);
+
+    <i>// "ROLE_USER" 같은 문자열을 콤마로 쪼개 권한 목록으로</i>
+    Collection&lt;? extends GrantedAuthority&gt; authorities =
+            Arrays.stream(claims.get(<b>"role"</b>).toString().split(","))
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+    <i>// 스프링 시큐리티의 User — 우리 User 엔티티가 아니다</i>
+    UserDetails principal = new User(<b>claims.getSubject()</b>, "", authorities);
+
+    return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+}</pre>
+      </figure>
+
+      <div class="note">
+        <span class="lbl">컨트롤러의 principal.getName()이 userId인 이유</span>
+        <p>
+          위에서 <code>new User(claims.getSubject(), ...)</code>로 만들 때 첫 인자가 곧 username이 된다.
+          <code>getSubject()</code>는 토큰 만들 때 <code>setSubject(userId)</code>로 넣은 값이니
+          결국 <strong>userId가 그대로 흘러나온다.</strong>
+        </p>
+        <figure class="code" style="margin-top:12px;">
+          <figcaption>controller/DiaryController.java</figcaption>
+          <pre>public ResponseEntity&lt;List&lt;DiaryResponse&gt;&gt; getAllDiarys(<b>Principal principal</b>) {
+    String userId = <b>principal.getName()</b>;   <i>// "testuser1" — 토큰의 sub</i>
+    ...
+}</pre>
+        </figure>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">주의: 두 개의 User 클래스</span>
+        <p>
+          <code>TokenProvider</code>가 쓰는 <code>User</code>는
+          <code>org.springframework.security.core.userdetails.User</code>다.
+          우리 프로젝트의 <code>com.yoona.emoletter_be.entity.User</code>와 <strong>이름만 같고 완전히 다른 클래스</strong>다.
+          import 문을 보지 않으면 헷갈리기 쉽다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 검증 ===================== -->
+    <section id="verify">
+      <h2>검증은 어디서 일어나는가</h2>
+      <p class="sub">파싱과 검증이 같은 동작인 이유</p>
+
+      <p>
+        <code>validateToken</code>은 따로 계산을 하지 않는다. <strong>파싱을 시도해보고 예외가 안 나면 유효</strong>하다고 판단한다.
+        서명 검사, 형식 검사, 만료 검사가 전부 파싱 과정에 들어 있기 때문이다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/jwt/TokenProvider.java</figcaption>
+        <pre>public boolean validateToken(String token){
+    try {
+        <b>getClaims(token);</b>      <i>// 파싱 성공 = 서명·형식·만료 모두 통과</i>
+        return true;
+    } catch (RuntimeException e){
+        System.out.println("토큰 유효성 검사 실패: " + e.getMessage());
+        return <b>false</b>;           <i>// 왜 실패했는지는 버려진다</i>
+    }
+}
+
+private Claims getClaims(String token){
+    try {
+        return Jwts.parser()
+                .setSigningKey(jwtProperties.getSecretKey().getBytes())
+                .<em>parseClaimsJws(token)</em>   <i>// 여기서 서명 대조 + 만료 확인</i>
+                .getBody();
+    } catch (<b>ExpiredJwtException</b> e){
+        throw new RuntimeException("만료된 토큰입니다. (Expired)", e);
+    } catch (Exception e) {
+        throw new RuntimeException("유효하지 않은 토큰입니다.", e);
+    }
+}</pre>
+      </figure>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>입력</th><th>getClaims 결과</th><th>validateToken</th><th>최종 응답</th></tr></thead>
+          <tbody>
+            <tr><td>헤더 없음 (<code>null</code>)</td><td>예외</td><td><span class="pill no">false</span></td><td>401</td></tr>
+            <tr><td>서명이 다른 토큰</td><td><code>SignatureException</code></td><td><span class="pill no">false</span></td><td>401</td></tr>
+            <tr><td>형식이 깨진 문자열</td><td><code>MalformedJwtException</code></td><td><span class="pill no">false</span></td><td>401</td></tr>
+            <tr><td>만료된 토큰</td><td><code>ExpiredJwtException</code></td><td><span class="pill no">false</span></td><td>401</td></tr>
+            <tr><td>정상 토큰</td><td>Claims 반환</td><td><span class="pill ok">true</span></td><td>200</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">만료와 위조를 구분하지 못한다</span>
+        <p>
+          네 가지 실패가 전부 <code>false</code> 하나로 뭉개진다. 클라이언트 입장에서는
+          “토큰이 만료됐으니 재발급하면 되는 상황”과 “토큰이 위조됐으니 다시 로그인해야 하는 상황”이 완전히 다른데,
+          지금은 둘 다 똑같이 401이다.
+        </p>
+        <p>
+          지금 프런트는 <strong>일단 재발급을 한 번 시도해 보고</strong>, 그것마저 실패하면 로그아웃시키는 식으로 대응한다.
+          응답 헤더나 본문에 사유를 실어주면 프런트가 더 정확히 분기할 수 있다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 재발급 ===================== -->
+    <section id="refresh">
+      <h2>재발급은 어떻게 도는가</h2>
+      <p class="sub">만료된 토큰에서 사용자 아이디를 꺼내는 특별한 경로</p>
+
+      <figure class="fig">
+        <div class="holder">
+          <svg viewBox="0 0 760 400" role="img" aria-label="브라우저가 401을 받으면 쿠키를 실어 토큰 재발급을 요청하고, 서버는 만료 허용 파싱으로 사용자 아이디를 꺼내 Redis 사본과 대조한 뒤 새 accessToken을 발급하며, 브라우저는 원래 요청을 재시도한다">
+            <text x="70" y="18" text-anchor="middle" class="sm">브라우저</text>
+            <text x="375" y="18" text-anchor="middle" class="sm">Spring</text>
+            <text x="680" y="18" text-anchor="middle" class="sm">Redis</text>
+            <line x1="70" y1="26" x2="70" y2="380" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="375" y1="26" x2="375" y2="380" class="s-line" stroke-dasharray="3 4"/>
+            <line x1="680" y1="26" x2="680" y2="380" class="s-line" stroke-dasharray="3 4"/>
+
+            <path d="M70 52 L368 52" class="ar" marker-end="url(#a4)"/>
+            <text x="80" y="46" class="sm">GET /api/diary + 만료된 토큰</text>
+
+            <path d="M375 84 L78 84" class="ar" marker-end="url(#a4)"/>
+            <text x="90" y="78" class="sm">401 Unauthorized</text>
+
+            <path d="M70 122 L368 122" class="ar-t" marker-end="url(#a4)"/>
+            <text x="80" y="116" class="tk">POST /api/token · 쿠키 자동 전송</text>
+
+            <rect x="250" y="136" width="250" height="34" rx="4" class="s-fill s-line"/>
+            <text x="375" y="157" text-anchor="middle" class="sm">getUserIdFromExpiredToken()</text>
+
+            <path d="M375 190 L672 190" class="ar" marker-end="url(#a4)"/>
+            <text x="390" y="184" class="sm">findById(userId)</text>
+
+            <path d="M680 220 L382 220" class="ar" marker-end="url(#a4)"/>
+            <text x="400" y="214" class="sm">저장된 refreshToken</text>
+
+            <rect x="250" y="234" width="250" height="34" rx="4" class="st-fill st-line"/>
+            <text x="375" y="255" text-anchor="middle" class="sm">문자열이 일치하는가?</text>
+
+            <path d="M375 288 L78 288" class="ar-t" marker-end="url(#a4)"/>
+            <text x="90" y="282" class="tk">201 + 새 accessToken</text>
+
+            <path d="M70 326 L368 326" class="ar" marker-end="url(#a4)"/>
+            <text x="80" y="320" class="sm">GET /api/diary 재시도 (새 토큰)</text>
+
+            <path d="M375 358 L78 358" class="ar" marker-end="url(#a4)"/>
+            <text x="90" y="352" class="sm">200 OK</text>
+
+            <defs>
+              <marker id="a4" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>
+          사용자는 이 왕복을 보지 못한다. 프런트의 <code>http.js</code>가 401을 가로채 재발급과 재시도를 대신 처리한다.
+        </figcaption>
+      </figure>
+
+      <h3>만료된 토큰을 일부러 읽는 메서드</h3>
+      <p>
+        재발급 시점에는 refreshToken이 만료됐을 수도 있다. 그런데 <strong>누구의 토큰인지는 알아야</strong>
+        Redis를 조회할 수 있다. 그래서 만료를 무시하고 클레임만 꺼내는 별도 경로가 필요하다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/jwt/TokenProvider.java</figcaption>
+        <pre>public Claims getExpiredClaims(String token) {
+    try {
+        return Jwts.parser().setSigningKey(...).parseClaimsJws(token).getBody();
+    } catch (<b>ExpiredJwtException e</b>) {
+        <i>// 만료됐어도 안에 든 정보는 필요하다 — 예외 객체가 클레임을 들고 있다</i>
+        return <b>e.getClaims()</b>;
+    } catch (Exception e) {
+        <i>// 서명 오류 등은 여전히 거부 — 위조 토큰까지 통과시키면 안 된다</i>
+        throw new RuntimeException("유효하지 않은 Refresh Token입니다.", e);
+    }
+}</pre>
+      </figure>
+
+      <div class="note">
+        <span class="lbl">이게 왜 안전한가</span>
+        <p>
+          만료를 무시하지만 <strong>서명 검증은 그대로 한다.</strong> 위조된 토큰은 여전히 예외로 걸린다.
+          게다가 사용자 아이디를 꺼낸 뒤 <strong>Redis에 저장된 값과 문자열까지 대조</strong>하므로,
+          로그아웃으로 사본이 지워졌다면 재발급도 막힌다.
+        </p>
+      </div>
+
+      <figure class="code">
+        <figcaption>service/TokenService.java</figcaption>
+        <pre>public String createNewAccessToken(String refreshToken) {
+    <i>// 1. 만료 여부와 무관하게 userId 추출 (서명은 검증됨)</i>
+    String userId = tokenProvider.<b>getUserIdFromExpiredToken</b>(refreshToken);
+
+    <i>// 2. Redis에 사본이 남아 있는가 (= 로그아웃하지 않았는가)</i>
+    RefreshToken storedToken = refreshTokenRepository.findById(userId)
+            .orElseThrow(() -&gt; new JwtValidationException("저장된 Refresh Token이 없습니다.", UNAUTHORIZED));
+
+    <i>// 3. 그 사본과 지금 받은 토큰이 같은가</i>
+    if (!storedToken.getRefreshToken().equals(refreshToken)) {
+        throw new JwtValidationException("제공된 Refresh Token이 저장된 값과 일치하지 않습니다.", UNAUTHORIZED);
+    }
+
+    <i>// 4. 통과하면 새 accessToken 발급</i>
+    User user = userService.findById(userId);
+    return tokenProvider.<b>createAccessToken</b>(user.getUserId(), user.getRole());
+}</pre>
+      </figure>
+
+      <div class="note warn">
+        <span class="lbl">refreshToken은 갱신되지 않는다</span>
+        <p>
+          재발급 시 accessToken만 새로 만들고 refreshToken은 그대로 둔다.
+          그래서 <strong>24시간이 지나면 재발급도 막히고 다시 로그인해야 한다.</strong>
+          보안을 더 챙기려면 재발급 때 refreshToken도 새로 발급하는 회전(rotation) 방식을 쓴다.
+        </p>
+      </div>
+
+      <h3>로그아웃</h3>
+      <p>
+        Redis의 사본을 지우고 브라우저 쿠키를 만료시킨다. 이미 발급된 accessToken은
+        <strong>남은 유효기간 동안 여전히 살아 있다.</strong> 이게 JWT의 근본적인 한계라
+        accessToken 수명을 짧게 잡는 것이다.
+      </p>
+    </section>
+
+    <!-- ===================== 헷갈리는 지점 ===================== -->
+    <section id="confuse">
+      <h2>여기서 자주 막힌다</h2>
+      <p class="sub">실제로 헷갈렸던 지점들</p>
+
+      <div class="qa">
+        <h4>토큰이 틀렸는데 왜 필터에서 안 막히나요?</h4>
+        <p>
+          필터는 인증을 <strong>설정</strong>만 하기 때문이다. <code>filterChain.doFilter()</code>가
+          <code>if</code> 블록 밖에 있어 무조건 다음으로 넘어간다.
+          막는 건 13번 <code>AuthorizationFilter</code>, 401 응답을 만드는 건 12번 <code>ExceptionTranslationFilter</code>다.
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>permitAll인 로그인 API가 왜 401을 뱉었나요?</h4>
+        <p>
+          그건 인증 문제가 아니었다. 컨트롤러 안에서 Redis 연결 실패로 500이 났고,
+          서블릿이 <code>/error</code>로 재요청을 보내는데 <strong>그 <code>/error</code>가 인증을 요구</strong>해서
+          진짜 원인이 401로 둔갑한 것이다. <code>/error</code>를 <code>permitAll</code>에 넣어 해결했다.
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>왜 UsernamePasswordAuthenticationFilter 앞에 넣나요? 쓰지도 않는데.</h4>
+        <p>
+          쓰지 않는 게 맞다. <code>addFilterBefore</code>는 <strong>순서를 정하는 기준점</strong>이 필요할 뿐이고,
+          그 자리가 “인증을 시도하기에 적절한 위치”라서 관례적으로 쓰인다.
+          중요한 건 <code>AnonymousAuthenticationFilter</code>와 <code>AuthorizationFilter</code>보다 <strong>앞</strong>이라는 사실이다.
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>세션을 STATELESS로 껐는데 SecurityContext는 어떻게 유지되나요?</h4>
+        <p>
+          유지되지 않는다. <strong>요청 하나가 끝나면 비워진다.</strong>
+          그래서 매 요청마다 토큰을 다시 읽고 다시 인증 객체를 만든다.
+          이게 “서버가 상태를 갖지 않는다”는 말의 실제 의미다.
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>필터가 DB를 조회하나요?</h4>
+        <p>
+          아니다. <code>getAuthentication</code>은 토큰의 클레임만으로 인증 객체를 만든다.
+          그래서 <strong>탈퇴한 회원의 토큰도 만료 전까지는 통과</strong>한다.
+          민감한 작업이라면 컨트롤러나 서비스에서 사용자 존재 여부를 다시 확인해야 한다.
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>로그아웃하면 accessToken은 프런트에서 지우지 않나요?</h4>
+        <p>
+          <strong>지운다.</strong> <code>AuthContext.logout()</code>이 <code>clearSession()</code>을 부르고,
+          그게 <code>setAccessToken('')</code>을 통해 메모리와 <code>localStorage</code>에서 모두 제거한다.
+          그래서 <strong>정상적인 사용에서는 로그아웃 즉시 토큰이 사라진다.</strong>
+        </p>
+        <figure class="code">
+          <figcaption>contexts/AuthContext.jsx</figcaption>
+          <pre>const clearSession = useCallback(() =&gt; {
+    <b>setAccessToken('');</b>   <i>// http.js → localStorage.removeItem('emoletter.accessToken')</i>
+    setUser(null);
+}, []);
+
+const logout = useCallback(async () =&gt; {
+    try {
+        await authApi.logout();      <i>// ① 서버: Redis 사본 삭제 + 쿠키 만료</i>
+    } catch {
+        <i>// 쿠키가 이미 없거나 서버가 죽어 있어도 클라이언트 세션은 정리한다.</i>
+    } finally {
+        <b>clearSession();</b>            <i>// ② 클라이언트: accessToken 폐기 (항상 실행)</i>
+    }
+}, [clearSession]);</pre>
+        </figure>
+        <p>
+          <code>finally</code>에 넣은 게 의도적이다. 서버 호출이 실패해도
+          <strong>브라우저 쪽 정리는 반드시 이뤄진다.</strong>
+        </p>
+      </div>
+
+      <div class="qa">
+        <h4>그런데 왜 “로그아웃해도 토큰이 살아 있다”고 하나요?</h4>
+        <p>
+          지우는 주체가 <strong>클라이언트뿐</strong>이기 때문이다.
+          서버는 accessToken을 어디에도 저장하지 않으므로,
+          <strong>브라우저 밖으로 이미 복사된 토큰은 회수할 수단이 없다.</strong>
+        </p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>로그아웃이 지우는 것</th><th>지우는 주체</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td>Redis의 refreshToken 사본</td><td>서버</td><td><span class="pill ok">재발급 즉시 차단</span></td></tr>
+              <tr><td>refreshToken 쿠키</td><td>서버 (<code>Max-Age=0</code>)</td><td><span class="pill ok">브라우저에서 제거</span></td></tr>
+              <tr><td><code>localStorage</code>의 accessToken</td><td>프런트</td><td><span class="pill ok">이 브라우저에서는 제거</span></td></tr>
+              <tr><td>이미 유출·복사된 accessToken</td><td><i>아무도</i></td><td><span class="pill no">최대 1시간 유효</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          즉 “살아 있다”는 건 <em>정상 사용자의 브라우저</em> 이야기가 아니라
+          <strong>XSS·개발자도구·네트워크 캡처 등으로 값이 이미 빠져나간 경우</strong>의 이야기다.
+          그 토큰을 curl로 그대로 보내면 로그아웃 후에도 만료 전까지 통과한다.
+          즉시 차단이 필요하면 Redis에 블랙리스트를 두고 필터에서 대조해야 하는데,
+          그러면 매 요청마다 Redis를 조회하게 되어 <strong>무상태의 이점을 일부 포기</strong>하게 된다.
+        </p>
+        <div class="note">
+          <span class="lbl">그래서 수명을 1시간으로 잡았다</span>
+          <p>
+            취소할 수 없다면 <strong>빨리 죽게 만드는 것</strong>이 대안이다.
+            유출 시 피해 범위를 1시간으로 묶고, 정작 위험한 24시간짜리 refreshToken은
+            <code>httpOnly</code> 쿠키에 넣어 JS가 아예 읽지 못하게 했다.
+          </p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <h4>JWT를 안 보내면 시큐리티 필터가 아예 안 도는 건가요?</h4>
+        <p>
+          아니다. <strong>필터 체인은 항상 전부 돈다.</strong> 토큰이 없으면 7번 필터가
+          할 일이 없어 그냥 지나칠 뿐이고, 통과 여부는 훨씬 뒤인 13번에서 결정된다.
+          자세한 건 <a href="#nojwt">토큰이 없는 요청도 필터를 전부 지난다</a>를 보라.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 손볼 곳 ===================== -->
+    <section id="todo">
+      <h2>코드에서 손볼 곳</h2>
+      <p class="sub">동작에는 문제없지만 정리하면 좋은 것들</p>
+
+      <h3>필터에 죽은 코드가 있다</h3>
+      <p>
+        <code>validateToken</code>을 <strong>두 번</strong> 호출하고, 두 번째 <code>if</code>의 본문은 비어 있다.
+        디버깅 로그를 넣다가 남은 흔적으로 보인다. 매 요청마다 검증이 두 번 돌고
+        <code>System.out.println</code>이 세 줄씩 찍힌다.
+      </p>
+
+      <figure class="code">
+        <figcaption>config/TokenAuthenticationFilter.java — 현재</figcaption>
+        <pre>if (tokenProvider.validateToken(token)) {          <i>// 1회차</i>
+    Authentication auth = tokenProvider.getAuthentication(token);
+    SecurityContextHolder.getContext().setAuthentication(auth);
+}
+
+System.out.println("Processing request path: " + request.getRequestURI());
+
+if (tokenProvider.validateToken(token)) {          <i>// 2회차 — 중복</i>
+    <i>// ...  본문이 비어 있다</i>
+} else {
+    System.out.println("Token validation failed or token is null. ...");
+}
+
+filterChain.doFilter(request, response);</pre>
+      </figure>
+
+      <p>
+        두 번째 블록을 지우고, 로그가 필요하면 <code>System.out</code> 대신 SLF4J
+        (<code>log.debug</code>)를 쓰는 편이 낫다. 운영에서 로그 레벨로 끌 수 있다.
+      </p>
+
+      <h3>JWT 라이브러리가 두 개 들어 있다</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>라이브러리</th><th>상태</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td><code>io.jsonwebtoken:jjwt:0.9.1</code></td><td><span class="pill tok">사용 중</span></td><td>2018년 버전. <code>Jwts.parser().setSigningKey(byte[])</code>는 현재 deprecated</td></tr>
+            <tr><td><code>com.auth0:java-jwt:4.4.0</code></td><td><span class="pill no">미사용</span></td><td><code>TokenProvider</code>에 import만 남아 있고 호출은 없다</td></tr>
+            <tr><td><code>javax.xml.bind:jaxb-api</code></td><td><span class="pill tok">간접 필요</span></td><td>jjwt 0.9.1이 Java 11+에서 요구해 추가된 것</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <code>com.auth0</code> import 세 줄(<code>JWT</code>, <code>Algorithm</code>, <code>DecodedJWT</code>)은 지워도 된다.
+        jjwt를 <code>0.12.x</code>로 올리면 jaxb 의존성도 함께 뺄 수 있지만 API가 바뀌므로 별도 작업이 필요하다.
+      </p>
+
+      <h3>실패 사유를 프런트에 알려주면 좋다</h3>
+      <p>
+        지금은 만료·위조·형식오류가 전부 401 하나로 나간다.
+        응답 헤더에 <code>X-Auth-Error: expired</code> 정도만 실어도
+        프런트가 “재발급 시도” 와 “즉시 로그아웃”을 정확히 나눌 수 있다.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="end">
+    EmoLetter JWT 인증 구조 · 필터 순서는 서버 기동 로그의 <code>DefaultSecurityFilterChain</code> 출력 기준 ·
+    2026년 8월 28일<br>
+    <span style="font-size:12.5px;">개정 2026년 9월 3일 — 로그인 발급 흐름, 쿠키를 고른 이유,
+    토큰 없는 요청의 필터 동작 추가. 로그아웃 항목은 “프런트가 accessToken을 지운다”는 사실을 반영해 다시 씀.</span>
+  </footer>
+
+</div>

@@ -1,0 +1,2731 @@
+<title>EmoLetter 핸드북</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --paper:      #FBF8FB;
+    --surface:    #FFFFFF;
+    --surface-2:  #F4EFF6;
+    --ink:        #1E1826;
+    --ink-soft:   #453B50;
+    --muted:      #6C6377;
+    --rule:       #E9E1EE;
+    --rule-soft:  #F2ECF5;
+    --rose:       #B84C77;
+    --violet:     #6D4C9F;
+    --rose-wash:  #FBEEF3;
+    --violet-wash:#F2ECFA;
+
+    --m-get:      #2F7D6E;
+    --m-post:     #2C6BB0;
+    --m-put:      #94620F;
+    --m-delete:   #B3383F;
+    --m-get-bg:   #E6F2EF;
+    --m-post-bg:  #E6EFF8;
+    --m-put-bg:   #F7F0E1;
+    --m-delete-bg:#F9E9EA;
+
+    --ok:         #2F7D6E;
+    --warn:       #94620F;
+    --bad:        #B3383F;
+
+    --shadow: 0 1px 2px rgba(30,24,38,.05), 0 8px 24px -12px rgba(30,24,38,.12);
+
+    --font-display: 'Gowun Batang', 'Nanum Myeongjo', Georgia, serif;
+    --font-body: 'IBM Plex Sans KR', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'D2Coding', Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #151220;
+      --surface:    #1D1830;
+      --surface-2:  #241E3A;
+      --ink:        #ECE6F1;
+      --ink-soft:   #C9C0D6;
+      --muted:      #9C92AB;
+      --rule:       #2E2745;
+      --rule-soft:  #262039;
+      --rose:       #F0A0BE;
+      --violet:     #C0A4EE;
+      --rose-wash:  #2D1F2B;
+      --violet-wash:#251F3B;
+
+      --m-get:      #6FC9B4;
+      --m-post:     #7FB4E8;
+      --m-put:      #DDB463;
+      --m-delete:   #EE8F95;
+      --m-get-bg:   #1B2E2A;
+      --m-post-bg:  #1B2735;
+      --m-put-bg:   #2E2718;
+      --m-delete-bg:#31201F;
+
+      --ok:         #6FC9B4;
+      --warn:       #DDB463;
+      --bad:        #EE8F95;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #151220;
+    --surface:    #1D1830;
+    --surface-2:  #241E3A;
+    --ink:        #ECE6F1;
+    --ink-soft:   #C9C0D6;
+    --muted:      #9C92AB;
+    --rule:       #2E2745;
+    --rule-soft:  #262039;
+    --rose:       #F0A0BE;
+    --violet:     #C0A4EE;
+    --rose-wash:  #2D1F2B;
+    --violet-wash:#251F3B;
+
+    --m-get:      #6FC9B4;
+    --m-post:     #7FB4E8;
+    --m-put:      #DDB463;
+    --m-delete:   #EE8F95;
+    --m-get-bg:   #1B2E2A;
+    --m-post-bg:  #1B2735;
+    --m-put-bg:   #2E2718;
+    --m-delete-bg:#31201F;
+
+    --ok:         #6FC9B4;
+    --warn:       #DDB463;
+    --bad:        #EE8F95;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- 레이아웃 ---------- */
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+
+  .masthead {
+    grid-column: 1 / -1;
+    padding: 72px 0 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    font-weight: 600;
+    margin: 0 0 18px;
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 60px);
+    line-height: 1.1;
+    font-weight: 700;
+    margin: 0 0 18px;
+    text-wrap: balance;
+    letter-spacing: -.01em;
+  }
+  .masthead .lede {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 28px;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-soft);
+  }
+  .chip.live { border-color: var(--ok); color: var(--ok); }
+  .chip.live::before { content: "● "; }
+
+  /* ---------- 목차 ---------- */
+  nav.toc {
+    position: sticky;
+    top: 24px;
+    font-size: 14px;
+  }
+  nav.toc p {
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  nav.toc a {
+    display: block;
+    padding: 6px 12px;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid var(--rule);
+    transition: color .15s, border-color .15s;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible {
+    color: var(--rose);
+    border-left-color: var(--rose);
+  }
+
+  main { min-width: 0; }
+
+  /* ---------- 섹션 ---------- */
+  section { padding-top: 56px; scroll-margin-top: 24px; }
+  section > h2 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+  }
+  section > .sub {
+    color: var(--muted);
+    margin: 0 0 32px;
+    font-size: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 40px 0 12px;
+    letter-spacing: -.005em;
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 26px 0 8px;
+    color: var(--ink-soft);
+  }
+  p { margin: 0 0 16px; max-width: 68ch; }
+  main a { color: var(--rose); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  ul, ol { max-width: 68ch; padding-left: 22px; margin: 0 0 16px; }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--muted); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: .875em;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+  a code { color: inherit; }
+
+  /* ---------- 코드 블록 ---------- */
+  .code {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .code figcaption {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--muted);
+    background: var(--rule-soft);
+  }
+  .code pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    tab-size: 2;
+  }
+  .code pre b { color: var(--rose); font-weight: 500; }
+  .code pre i { color: var(--muted); font-style: normal; }
+
+  /* ---------- 표 ---------- */
+  .scroll { overflow-x: auto; margin: 0 0 24px; border-radius: 10px; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--rule-soft);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { background: transparent; padding: 0; }
+  .num { font-variant-numeric: tabular-nums; text-align: right; color: var(--muted); }
+
+  /* ---------- HTTP 메서드 칩 ---------- */
+  .m {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: .04em;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .m.get    { color: var(--m-get);    background: var(--m-get-bg); }
+  .m.post   { color: var(--m-post);   background: var(--m-post-bg); }
+  .m.put    { color: var(--m-put);    background: var(--m-put-bg); }
+  .m.delete { color: var(--m-delete); background: var(--m-delete-bg); }
+
+  .lock { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* ---------- 화면 카드 ---------- */
+  .screens { display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px; }
+  .screen {
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    background: var(--surface);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+  .screen header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .screen h3 { margin: 0; font-size: 17px; }
+  .screen .path {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .screen p { margin: 0 0 14px; font-size: 15px; }
+  .screen dl { margin: 0; display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 6px 16px; font-size: 14px; }
+  .screen dt {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    padding-top: 4px;
+  }
+  .screen dd { margin: 0; color: var(--ink-soft); }
+  .screen dd code { font-size: 12px; }
+
+  /* ---------- 콜아웃 ---------- */
+  .note {
+    border-left: 3px solid var(--violet);
+    background: var(--violet-wash);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 0 0 20px;
+    font-size: 14px;
+    max-width: 68ch;
+  }
+  .note.caution { border-left-color: var(--warn); background: var(--m-put-bg); }
+  .note.danger  { border-left-color: var(--bad);  background: var(--m-delete-bg); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--violet);
+  }
+  .note.caution .label { color: var(--warn); }
+  .note.danger .label  { color: var(--bad); }
+
+  /* ---------- 파일 트리 ---------- */
+  .tree {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.85;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .tree .dir { color: var(--violet); font-weight: 500; }
+  .tree .cmt { color: var(--muted); }
+  .tree .ln  { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* ---------- 단계 목록 (실제 순서가 정보인 곳만) ---------- */
+  ol.steps { list-style: none; padding: 0; counter-reset: step; max-width: 68ch; }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 44px;
+    margin-bottom: 26px;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 2px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--rose-wash);
+    color: var(--rose);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+    font-weight: 500;
+  }
+  ol.steps h4 { margin: 0 0 6px; font-size: 15px; color: var(--ink); }
+
+  /* ---------- 상태 배지 ---------- */
+  .status { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .status.ok   { color: var(--ok); }
+  .status.warn { color: var(--warn); }
+  .status.bad  { color: var(--bad); }
+
+  /* ---------- 다이어그램 ---------- */
+  .figure { margin: 0 0 24px; }
+  .figure .holder {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .figure svg { display: block; min-width: 640px; width: 100%; height: auto; }
+  .figure figcaption { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+  .box-fill   { fill: var(--surface-2); }
+  .box-stroke { stroke: var(--rule); }
+  .accent-fill   { fill: var(--rose-wash); }
+  .accent-stroke { stroke: var(--rose); }
+  .v-fill   { fill: var(--violet-wash); }
+  .v-stroke { stroke: var(--violet); }
+  .t   { fill: var(--ink); font-family: var(--font-body); font-size: 13px; font-weight: 500; }
+  .t-s { fill: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+  .arrow { stroke: var(--muted); fill: none; stroke-width: 1.5; }
+
+  /* ---------- 변경 이력 ---------- */
+  .changelog { display: flex; flex-direction: column; gap: 0; }
+  .change {
+    position: relative;
+    padding: 0 0 32px 28px;
+    border-left: 2px solid var(--rule);
+  }
+  .change:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .change::before {
+    content: "";
+    position: absolute;
+    left: -7px; top: 6px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--rose);
+  }
+  .change.reverted::before { border-color: var(--muted); }
+  .change > header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .change h3 { margin: 0; font-size: 17px; }
+  .tag {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .tag.security { color: var(--m-delete); background: var(--m-delete-bg); }
+  .tag.feature  { color: var(--m-post);   background: var(--m-post-bg); }
+  .tag.config   { color: var(--m-put);    background: var(--m-put-bg); }
+  .tag.ops      { color: var(--m-get);    background: var(--m-get-bg); }
+  .tag.revert   { color: var(--muted);    background: var(--surface-2); }
+  .change .files {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    max-width: none;
+  }
+  .qa { display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 4px 14px; margin: 0 0 16px; font-size: 15px; }
+  .qa dt {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--violet); font-weight: 600; padding-top: 5px;
+  }
+  .qa dd { margin: 0; color: var(--ink-soft); }
+  .qa dd p { margin: 0 0 8px; }
+  .qa dd p:last-child { margin-bottom: 0; }
+  @media (max-width: 700px) {
+    .qa { grid-template-columns: minmax(0,1fr); gap: 2px; }
+    .qa dt { padding-top: 12px; }
+  }
+
+  footer.end {
+    grid-column: 1 / -1;
+    margin-top: 72px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  :focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; border-radius: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: minmax(0,1fr); gap: 0; padding: 0 20px 72px; }
+    nav.toc {
+      position: static;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 16px;
+    }
+    nav.toc ol { flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+    nav.toc a { border-left: none; border: 1px solid var(--rule); border-radius: 999px; white-space: nowrap; padding: 4px 12px; }
+    nav.toc a:hover { border-color: var(--rose); }
+    .masthead { padding-top: 48px; }
+    .screen dl { grid-template-columns: minmax(0,1fr); gap: 2px; }
+    .screen dt { padding-top: 12px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">개발 문서 · 2026.08.31 개정</p>
+    <h1>EmoLetter</h1>
+    <p class="lede">
+      하루의 감정을 이모지와 함께 달력에 기록하고, 미래의 나에게 편지를 보내
+      정해둔 날짜가 되면 받아보는 서비스. 이 문서는 화면 구성, 프론트엔드 컴포넌트 구조,
+      백엔드 API 계약, 그리고 로컬 실행 방법을 정리한 개발 핸드북이다.
+    </p>
+    <div class="chips">
+      <span class="chip">React 19</span>
+      <span class="chip">Vite 6</span>
+      <span class="chip">Tailwind 3</span>
+      <span class="chip">Spring Boot 3.2</span>
+      <span class="chip">Java 21</span>
+      <span class="chip">MySQL 8</span>
+      <span class="chip">Redis</span>
+      <span class="chip live">로컬 연동 검증 완료</span>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <p>목차</p>
+    <ol>
+      <li><a href="#overview">개요</a></li>
+      <li><a href="#system">시스템 구성</a></li>
+      <li><a href="#screens">화면 소개</a></li>
+      <li><a href="#features">기능 상세</a></li>
+      <li><a href="#structure">코드 구조</a></li>
+      <li><a href="#code">핵심 코드 해설</a></li>
+      <li><a href="#api">API 레퍼런스</a></li>
+      <li><a href="#backend">백엔드 수정 내역</a></li>
+      <li><a href="#changelog">변경 이력</a></li>
+      <li><a href="#run">실행 방법</a></li>
+      <li><a href="#issues">알려진 이슈</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ============ 개요 ============ -->
+    <section id="overview">
+      <h2>개요</h2>
+      <p class="sub">무엇을 만드는 서비스이고, 저장소가 어떻게 나뉘어 있는가</p>
+
+      <p>
+        EmoLetter는 두 가지 기록을 다룬다. 하나는 <strong>감정 일기</strong>로, 날짜마다 감정 하나와
+        글을 남기면 달력 칸에 해당 이모지가 표시된다. 다른 하나는 <strong>타임캡슐 편지</strong>로,
+        받을 날짜를 지정해 글을 써두면 그 날짜가 지나야 열어볼 수 있다.
+      </p>
+      <p>
+        저장소는 프론트엔드와 백엔드가 한 리포지터리에 나란히 들어있는 모노리포 구조다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>디렉터리</th><th>내용</th><th>기술</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>EmoLetter_FE/</code></td>
+              <td>웹 프론트엔드. 달력·일기·편지함 UI 전체</td>
+              <td>React 19, Vite 6, Tailwind CSS 3</td>
+            </tr>
+            <tr>
+              <td><code>EmoLetter_BE/</code></td>
+              <td>REST API 서버. 인증·일기·편지 도메인</td>
+              <td>Spring Boot 3.2, JPA, Spring Security, JWT</td>
+            </tr>
+            <tr>
+              <td><code>.github/workflows/</code></td>
+              <td>EC2 배포 파이프라인 <span class="status warn">현재 중단</span></td>
+              <td>GitHub Actions, DockerHub</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>도메인 모델</h3>
+      <p>
+        백엔드 엔티티는 세 개다. <code>User</code>가 <code>Diary</code>와 <code>Letter</code>를 각각
+        1:N으로 소유한다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>엔티티</th><th>주요 필드</th><th>비고</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>User</code></td>
+              <td><code>userId</code>(PK, String), <code>email</code>, <code>nickname</code>, <code>password</code>, <code>role</code>, <code>createAt</code></td>
+              <td>PK가 숫자가 아니라 사용자가 정한 아이디 문자열이다. 비밀번호는 BCrypt로 저장</td>
+            </tr>
+            <tr>
+              <td><code>Diary</code></td>
+              <td><code>diaryId</code>, <code>content</code>, <code>emojiCode</code>, <code>createAt</code>, <code>user</code></td>
+              <td><code>emojiCode</code>는 자유 문자열 컬럼이라 감정 종류를 프론트에서 늘려도 스키마 변경이 없다</td>
+            </tr>
+            <tr>
+              <td><code>Letter</code></td>
+              <td><code>letterId</code>, <code>title</code>, <code>content</code>, <code>noteCode</code>, <code>deliverDate</code>, <code>isDelivered</code>, <code>isOpened</code>, <code>createAt</code>, <code>user</code></td>
+              <td><code>title</code>은 2026.08.27 추가. 그 전 편지를 위해 nullable이다</td>
+            </tr>
+            <tr>
+              <td><code>RefreshToken</code></td>
+              <td><code>userId</code>(key), <code>refreshToken</code></td>
+              <td>MySQL이 아니라 Redis에 저장된다. TTL 24시간</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="label">편지의 두 가지 상태 플래그</span>
+        <p>
+          <code>isDelivered</code>는 “받을 날짜가 지나 열람 가능해졌는가”, <code>isOpened</code>는
+          “사용자가 실제로 열어봤는가”를 뜻한다. 서로 다른 개념이라 둘 다 필요하다.
+          <code>isDelivered</code>는 백엔드 스케줄러가 매분 갱신하고, <code>isOpened</code>는
+          상세 조회 API가 호출될 때 켜진다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 시스템 구성 ============ -->
+    <section id="system">
+      <h2>시스템 구성</h2>
+      <p class="sub">로컬에서 요청이 흐르는 경로와 각 포트의 역할</p>
+
+      <figure class="figure">
+        <div class="holder">
+          <svg viewBox="0 0 700 330" role="img" aria-label="브라우저에서 Vite 개발 서버를 거쳐 Spring Boot로, 다시 MySQL과 Redis로 이어지는 요청 흐름도">
+            <rect x="1" y="14" width="200" height="62" rx="9" class="box-fill box-stroke" stroke-width="1.5"/>
+            <text x="101" y="41" text-anchor="middle" class="t">브라우저</text>
+            <text x="101" y="60" text-anchor="middle" class="t-s">React SPA</text>
+
+            <path d="M101 76 L101 116" class="arrow" marker-end="url(#ah)"/>
+            <text x="112" y="94" class="t-s">fetch('/api/…')</text>
+            <text x="112" y="109" class="t-s">Authorization: Bearer</text>
+
+            <rect x="1" y="120" width="200" height="62" rx="9" class="v-fill v-stroke" stroke-width="1.5"/>
+            <text x="101" y="147" text-anchor="middle" class="t">Vite dev server</text>
+            <text x="101" y="166" text-anchor="middle" class="t-s">localhost:5173</text>
+
+            <path d="M201 151 L286 151" class="arrow" marker-end="url(#ah)"/>
+            <text x="243" y="140" text-anchor="middle" class="t-s">/api 프록시</text>
+
+            <rect x="290" y="120" width="200" height="62" rx="9" class="accent-fill accent-stroke" stroke-width="1.5"/>
+            <text x="390" y="147" text-anchor="middle" class="t">Spring Boot</text>
+            <text x="390" y="166" text-anchor="middle" class="t-s">localhost:8080</text>
+
+            <path d="M340 182 L340 226" class="arrow" marker-end="url(#ah)"/>
+            <path d="M440 182 L440 226" class="arrow" marker-end="url(#ah)"/>
+
+            <rect x="240" y="230" width="196" height="66" rx="9" class="box-fill box-stroke" stroke-width="1.5"/>
+            <text x="338" y="256" text-anchor="middle" class="t">MySQL · 3306</text>
+            <text x="338" y="276" text-anchor="middle" class="t-s">회원 · 일기 · 편지</text>
+
+            <rect x="452" y="230" width="196" height="66" rx="9" class="box-fill box-stroke" stroke-width="1.5"/>
+            <text x="550" y="256" text-anchor="middle" class="t">Redis · 6379</text>
+            <text x="550" y="276" text-anchor="middle" class="t-s">refreshToken</text>
+
+            <defs>
+              <marker id="ah" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="var(--muted)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <figcaption>로컬 개발 시 요청 경로. 브라우저는 항상 5173만 바라보고, 8080을 직접 호출하지 않는다.</figcaption>
+      </figure>
+
+      <h3>왜 Vite 프록시를 쓰는가</h3>
+      <p>
+        브라우저가 5173에서 8080을 직접 부르면 다른 오리진이므로 CORS 예비 요청이 필요하고,
+        로그인 시 백엔드가 내려주는 <code>refreshToken</code> 쿠키가 <code>httpOnly</code> + 크로스 오리진이라
+        전송 조건이 까다로워진다. 프록시를 두면 브라우저 입장에서는 전부 <strong>같은 오리진</strong>이라
+        이 두 문제가 동시에 사라진다.
+      </p>
+
+      <figure class="code">
+        <figcaption>EmoLetter_FE/vite.config.js</figcaption>
+        <pre>export default defineConfig(({ mode }) =&gt; {
+  const env = loadEnv(mode, '.', '')
+  const backendOrigin = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080'
+
+  return {
+    plugins: [react()],
+    server: {
+      proxy: {
+        <b>'/api'</b>: { target: backendOrigin, changeOrigin: true },
+      },
+    },
+  }
+})</pre>
+      </figure>
+
+      <p>
+        프록시를 쓰지 않고 배포 환경처럼 직접 호출하는 경우를 대비해 백엔드에도 CORS 설정을 넣어두었다.
+        <code>refreshToken</code> 쿠키를 주고받아야 하므로 <code>allowCredentials=true</code>이고,
+        그 경우 와일드카드 오리진을 쓸 수 없어 주소를 명시했다.
+      </p>
+
+      <figure class="code">
+        <figcaption>EmoLetter_BE/…/config/WebSecurityConfig.java</figcaption>
+        <pre>configuration.setAllowedOrigins(List.of(
+    "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"));
+configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+configuration.setAllowCredentials(<b>true</b>);
+source.registerCorsConfiguration("/api/**", configuration);</pre>
+      </figure>
+    </section>
+
+    <!-- ============ 화면 소개 ============ -->
+    <section id="screens">
+      <h2>화면 소개</h2>
+      <p class="sub">여덟 개 화면의 목적, 진입 경로, 구성 요소, 호출하는 API</p>
+
+      <p>
+        라우터 라이브러리 대신 <code>currentView</code> 상태 하나로 화면을 전환한다.
+        상태 값은 <code>constants/views.js</code>의 <code>VIEWS</code> 상수로 관리하고,
+        실제 분기는 <code>ViewRouter</code>가 담당한다.
+      </p>
+
+      <div class="screens">
+
+        <article class="screen">
+          <header>
+            <h3>랜딩</h3>
+            <span class="path">components/landing/Landing.jsx</span>
+          </header>
+          <p>
+            앱을 열면 가장 먼저 보이는 전체 화면 인트로. “Diarise &amp; Daydreams” 타이틀과
+            그라데이션 배경 장식이 있고, 화면 아무 곳이나 클릭하거나 Enter를 누르면 본 화면으로 들어간다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>앱 최초 진입 (<code>showLanding = true</code>)</dd>
+            <dt>나가기</dt><dd>클릭 또는 Enter → 달력으로. 한 번 나가면 다시 돌아오지 않는다</dd>
+            <dt>API</dt><dd>없음. 순수 정적 화면이며 헤더도 표시되지 않는다</dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>달력</h3>
+            <span class="path">components/calendar/CalendarPage.jsx</span>
+          </header>
+          <p>
+            서비스의 홈. 6주 × 7일 = 42칸 그리드로 한 달을 보여주고, 일기를 쓴 날에는
+            그 날의 감정 이모지가 날짜 아래에 함께 표시된다. 오늘 날짜는 그라데이션으로 강조된다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>랜딩 통과 직후, 헤더의 홈 버튼, 글쓰기 화면의 돌아가기</dd>
+            <dt>구성</dt><dd><code>CalendarNav</code>(월 이동) · <code>WeekdayRow</code>(요일) · <code>CalendarGrid</code> → <code>CalendarCell</code> × 42</dd>
+            <dt>상호작용</dt><dd>날짜 클릭 → 일기 작성 화면. 단 편지 모드로 진입한 상태면 편지 작성으로 간다</dd>
+            <dt>API</dt><dd><span class="m get">GET</span> <code>/api/diary</code> — <code>DiaryContext</code>가 로그인 시 한 번 불러 날짜별로 색인</dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>일기 작성</h3>
+            <span class="path">components/diary/DiaryWritePage.jsx</span>
+          </header>
+          <p>
+            선택한 날짜의 감정과 글을 기록한다. 감정 8종을 카드로 고르고 본문을 쓴 뒤 저장한다.
+            그 날짜에 이미 일기가 있으면 기존 내용이 채워진 채로 열리고, 저장하면 수정으로 처리된다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>달력에서 날짜 클릭</dd>
+            <dt>구성</dt><dd><code>BackButton</code> · <code>EmotionPicker</code>(감정 8종) · 본문 textarea · 저장/취소</dd>
+            <dt>검증</dt><dd>감정 선택과 본문이 모두 있어야 저장 버튼이 활성화된다</dd>
+            <dt>API</dt><dd><span class="m post">POST</span> <code>/api/diary</code> 신규 · <span class="m put">PUT</span> <code>/api/diary/{diaryId}</code> 수정 → 저장 후 목록 갱신</dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>편지 작성</h3>
+            <span class="path">components/letter/LetterWritePage.jsx</span>
+          </header>
+          <p>
+            미래의 나에게 보낼 편지를 쓴다. 받을 날짜와 제목을 정하고 편지지 색을 고른 뒤 본문을 작성한다.
+            날짜 입력에는 <code>min</code>이 오늘로 걸려 있어 과거 날짜는 고를 수 없다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>헤더 메뉴 → 편지 보내기. 이후 달력에서 날짜를 눌러도 편지 작성으로 연결된다</dd>
+            <dt>구성</dt><dd>날짜 input · 제목 input · <code>NotePicker</code>(편지지 4종) · 본문 textarea</dd>
+            <dt>완료 후</dt><dd>보낸 편지함으로 자동 이동</dd>
+            <dt>API</dt><dd><span class="m post">POST</span> <code>/api/letter</code></dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>보낸 편지함</h3>
+            <span class="path">components/letter/SentLettersPage.jsx</span>
+          </header>
+          <p>
+            내가 쓴 편지 전체를 보낸 날짜 최신순으로 보여준다. 전체 / 읽은 / 읽지 않은 세 가지로
+            거를 수 있고, 각 탭에는 실제 건수가 함께 표시된다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>헤더 메뉴 → 보낸 편지함, 또는 편지 발송 완료 직후</dd>
+            <dt>구성</dt><dd><code>FilterTabs</code> · <code>LetterList</code> → <code>LetterCard</code> · <code>LetterDetailModal</code></dd>
+            <dt>표시</dt><dd>아직 받을 날짜가 안 된 편지는 본문 대신 “아직 열어볼 수 없는 편지”로 가려진다</dd>
+            <dt>API</dt><dd><span class="m get">GET</span> <code>/api/letter?isOpened=true</code> + <code>false</code> 두 번 호출해 합침</dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>받은 편지함</h3>
+            <span class="path">components/letter/ReceivedLettersPage.jsx</span>
+          </header>
+          <p>
+            보낸 편지 중 <strong>받을 날짜가 이미 지난 것만</strong> 걸러 보여준다. 별도 API가 아니라
+            같은 편지 목록에서 도착 여부로 필터링한 결과다. 편지를 누르면 모달로 전문이 열리고
+            동시에 읽음 처리된다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>헤더 메뉴 → 받은 편지함</dd>
+            <dt>필터 기준</dt><dd><code>isDelivered</code>가 <code>true</code>이거나, <code>deliverDate</code>가 현재 시각 이전</dd>
+            <dt>API</dt><dd><span class="m get">GET</span> <code>/api/letter/{letterId}</code> — 열람 시 호출, 백엔드가 <code>isOpened</code>를 켠다</dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>마이페이지</h3>
+            <span class="path">components/mypage/MyPage.jsx</span>
+          </header>
+          <p>
+            아이디·이메일·닉네임과 함께 일기 수, 보낸 편지 수, 받은 편지 수를 통계 카드로 보여준다.
+            통계는 별도 API 없이 이미 불러온 컨텍스트 데이터에서 계산한다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>헤더 메뉴 → 마이페이지</dd>
+            <dt>구성</dt><dd><code>ProfileSummary</code> · <code>StatCard</code> × 3 · <code>NicknameForm</code></dd>
+            <dt>비로그인</dt><dd><code>AuthRequired</code> 안내 화면으로 대체된다</dd>
+            <dt>API</dt><dd><span class="m get">GET</span> <code>/api/user</code> · <span class="m put">PUT</span> <code>/api/user/info</code></dd>
+          </dl>
+        </article>
+
+        <article class="screen">
+          <header>
+            <h3>로그인 · 회원가입 모달</h3>
+            <span class="path">components/auth/LoginModal.jsx</span>
+          </header>
+          <p>
+            화면 전환이 아니라 어느 화면에서든 위에 겹쳐 뜨는 모달. 상단 탭으로 로그인과 회원가입을
+            오가며, 탭을 바꾸면 입력값과 에러가 초기화된다. 회원가입에 성공하면 곧바로 로그인까지 이어진다.
+          </p>
+          <dl>
+            <dt>진입</dt><dd>헤더의 로그인/회원가입 버튼, 또는 보호된 화면의 “로그인하기”</dd>
+            <dt>구성</dt><dd><code>AuthTabs</code> · <code>LoginFields</code>(2칸) / <code>SignupFields</code>(5칸) · <code>useAuthForm</code></dd>
+            <dt>검증</dt><dd>필수값, 이메일 형식, 비밀번호 6자 이상, 비밀번호 확인 일치</dd>
+            <dt>API</dt><dd><span class="m post">POST</span> <code>/api/user</code> → <span class="m post">POST</span> <code>/api/user/login</code></dd>
+          </dl>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ 기능 상세 ============ -->
+    <section id="features">
+      <h2>기능 상세</h2>
+      <p class="sub">인증, 일기, 편지 세 흐름이 실제로 어떻게 동작하는가</p>
+
+      <h3>인증과 세션</h3>
+      <p>
+        로그인에 성공하면 백엔드는 두 개의 토큰을 만든다. <code>accessToken</code>은 응답 본문에 담겨 오고,
+        <code>refreshToken</code>은 <code>httpOnly</code> 쿠키로 내려온다. 프론트는 <code>accessToken</code>만
+        <code>localStorage</code>에 보관하고 모든 요청에 <code>Authorization: Bearer</code>로 붙인다.
+      </p>
+      <ul>
+        <li><strong>세션 복구</strong> — 새로고침하면 <code>AuthContext</code>가 저장된 토큰으로 <code>GET /api/user</code>를 호출해 사용자 정보를 되살린다. 실패하면 토큰을 버린다.</li>
+        <li><strong>복구 중 깜빡임 방지</strong> — <code>initializing</code> 상태 동안 헤더는 빈 자리만 잡아두어 로그인 버튼이 잠깐 나타났다 사라지지 않는다.</li>
+        <li><strong>401 처리</strong> — <code>http.js</code>가 401을 받으면 등록된 콜백으로 세션을 정리한다.</li>
+        <li><strong>로그아웃</strong> — <code>DELETE /api/user/logout</code>으로 서버의 refreshToken을 지우고 쿠키를 만료시킨다. 서버가 실패해도 클라이언트 세션은 반드시 정리한다.</li>
+      </ul>
+
+      <div class="note">
+        <span class="label">토큰 자동 재발급 (2026.08.27 해결)</span>
+        <p>
+          <code>POST /api/token</code>이 쿠키에서 <code>refreshToken</code>을 읽도록 바뀌면서
+          프런트에서도 재발급을 호출할 수 있게 됐다. 이제 401을 받으면 재발급을 한 번 시도하고
+          원래 요청을 재시도한다. 재발급까지 실패했을 때만 세션을 정리한다.
+          자세한 내용은 <a href="#changelog">변경 이력</a> 참고.
+        </p>
+      </div>
+
+      <h3>감정 일기</h3>
+      <p>
+        감정은 <code>constants/emotions.js</code>에 8종이 정의돼 있고, <code>code</code> 값이 그대로
+        백엔드 <code>emojiCode</code>로 저장된다. DB 컬럼이 자유 문자열이라 감정을 추가해도 마이그레이션이 필요 없다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>code</th><th>이모지</th><th>라벨</th><th>code</th><th>이모지</th><th>라벨</th></tr></thead>
+          <tbody>
+            <tr><td><code>HAPPY</code></td><td>😊</td><td>행복</td><td><code>EXCITED</code></td><td>🤩</td><td>신남</td></tr>
+            <tr><td><code>SAD</code></td><td>😢</td><td>슬픔</td><td><code>CALM</code></td><td>😌</td><td>평온</td></tr>
+            <tr><td><code>ANGRY</code></td><td>😠</td><td>화남</td><td><code>LOVE</code></td><td>🥰</td><td>사랑</td></tr>
+            <tr><td><code>ANXIOUS</code></td><td>😰</td><td>불안</td><td><code>TIRED</code></td><td>😴</td><td>피곤</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        백엔드는 “그 날짜의 일기를 찾는” API가 없고 전체 목록만 준다. 그래서 프론트가
+        <code>createAt</code>을 <code>YYYY-MM-DD</code> 키로 바꿔 객체에 색인해두고, 달력과 작성 화면은
+        그 색인을 조회한다. 같은 날짜에 여러 건이 있으면 마지막 것이 남는다.
+      </p>
+
+      <figure class="code">
+        <figcaption>contexts/DiaryContext.jsx — 날짜 키 색인과 신규/수정 자동 판별</figcaption>
+        <pre><i>// 목록을 'YYYY-MM-DD' → 일기 객체로 색인</i>
+setDiaries(list.reduce((acc, diary) =&gt; {
+  if (!diary.date) return acc;
+  acc[<b>toDateKey</b>(diary.date)] = diary;
+  return acc;
+}, {}));
+
+<i>// 그 날짜에 이미 일기가 있으면 수정, 없으면 생성</i>
+const existing = diaries[toDateKey(date)];
+if (existing?.id) {
+  await diaryApi.<b>updateDiary</b>(existing.id, { date, emotion, content });
+} else {
+  await diaryApi.<b>createDiary</b>({ date, emotion, content });
+}
+await refresh();</pre>
+      </figure>
+
+      <h3>타임캡슐 편지</h3>
+      <p>
+        편지 목록 API는 <code>isOpened</code> 파라미터가 필수라 “전체”를 한 번에 받을 수 없다.
+        그래서 <code>true</code>와 <code>false</code>로 두 번 호출한 뒤 합쳐서 보낸 날짜 최신순으로 정렬한다.
+      </p>
+
+      <figure class="code">
+        <figcaption>api/letterApi.js</figcaption>
+        <pre>export const fetchAllLetters = async () =&gt; {
+  const [opened, unopened] = await Promise.all([
+    api.get('/letter', { params: { isOpened: <b>true</b> } }),
+    api.get('/letter', { params: { isOpened: <b>false</b> } }),
+  ]);
+  return [...(opened || []), ...(unopened || [])]
+    .map(toLetter)
+    .sort((a, b) =&gt; (b.sentDate?.getTime() || 0) - (a.sentDate?.getTime() || 0));
+};</pre>
+      </figure>
+
+      <p>
+        받은 편지함은 별도 엔드포인트가 아니라 이 목록에서 <strong>도착한 것만</strong> 거른 결과다.
+        도착 판정은 백엔드 스케줄러의 <code>isDelivered</code>를 우선 보되, 아직 반영되지 않았어도
+        받을 날짜가 지났으면 도착한 것으로 취급한다. 스케줄러가 1분에 한 번 도니 그 사이 공백을 메우기 위한 것이다.
+      </p>
+
+      <figure class="code">
+        <figcaption>utils/letter.js</figcaption>
+        <pre>export const isArrived = (letter) =&gt;
+  Boolean(letter.isDelivered) ||
+  (letter.deliverDate ? new Date(letter.deliverDate).getTime() &lt;= Date.now() : false);</pre>
+      </figure>
+
+      <p>
+        편지를 누르면 <code>useLetterReader</code>가 도착 여부를 먼저 확인한다. 아직이면 열지 않고
+        “아직 받을 날짜가 되지 않은 편지예요”를 띄우고, 도착했으면 상세 조회를 호출한다.
+        이 호출 자체가 백엔드에서 읽음 처리를 겸한다.
+      </p>
+
+      <h3>편지지</h3>
+      <p>
+        <code>noteCode</code>에 저장되며 <code>PINK</code>, <code>PURPLE</code>, <code>MINT</code>, <code>CREAM</code> 네 종류다.
+        카드 좌측 색 블록과 모달 상단 띠에 반영된다. 알 수 없는 코드가 오면 기본값 <code>PINK</code>로 대체한다.
+      </p>
+    </section>
+
+    <!-- ============ 코드 구조 ============ -->
+    <section id="structure">
+      <h2>코드 구조</h2>
+      <p class="sub">레이어 규칙과 실제 파일 배치</p>
+
+      <h3>단 하나의 규칙</h3>
+      <p>
+        <strong>컴포넌트는 서버를 직접 부르지 않는다.</strong> 데이터는 항상
+        컴포넌트 → 컨텍스트 → API 모듈 → <code>http.js</code> 순으로만 내려간다.
+        이 규칙 덕분에 엔드포인트가 바뀌어도 컴포넌트를 건드릴 일이 없고,
+        컴포넌트는 순수하게 화면 조립만 담당한다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>레이어</th><th>책임</th><th>해서는 안 되는 일</th></tr></thead>
+          <tbody>
+            <tr><td><code>components/</code></td><td>화면 조립, 입력 검증, 로컬 UI 상태</td><td><code>fetch</code> 직접 호출</td></tr>
+            <tr><td><code>contexts/</code></td><td>전역 상태 보관, API 호출 시점 결정, 로딩·에러 상태</td><td>Tailwind 클래스, JSX 마크업</td></tr>
+            <tr><td><code>api/</code></td><td>엔드포인트 경로, 요청 본문 조립, 응답을 프론트 모델로 변환</td><td>React 훅 사용</td></tr>
+            <tr><td><code>utils/</code> · <code>constants/</code></td><td>날짜 포맷, 도착 판정, 감정·편지지 코드표</td><td>상태 보유</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>파일 배치</h3>
+      <p>
+        전체 63개 파일, 총 2,272줄. 가장 큰 파일이 121줄(<code>http.js</code>)이라
+        어느 파일이든 한 화면 안에서 다 읽힌다.
+      </p>
+
+      <div class="tree"><span class="dir">src/</span>
+├─ App.jsx                       <span class="ln">16</span>  <span class="cmt">프로바이더 3중첩만</span>
+├─ <span class="dir">api/</span>
+│  ├─ http.js                    <span class="ln">121</span> <span class="cmt">fetch 래퍼 · 토큰 · 에러 변환</span>
+│  ├─ authApi.js                 <span class="ln">34</span>
+│  ├─ diaryApi.js                <span class="ln">36</span>
+│  └─ letterApi.js               <span class="ln">48</span>
+├─ <span class="dir">contexts/</span>
+│  ├─ AuthContext.jsx            <span class="ln">102</span> <span class="cmt">로그인 · 세션 복구 · 401 처리</span>
+│  ├─ DiaryContext.jsx           <span class="ln">81</span>  <span class="cmt">날짜 키 색인</span>
+│  └─ LetterContext.jsx          <span class="ln">83</span>  <span class="cmt">보낸/받은 편지 파생</span>
+├─ <span class="dir">hooks/</span>
+│  ├─ useAppNavigation.js        <span class="ln">56</span>  <span class="cmt">화면 전환 상태 기계</span>
+│  ├─ useLetterReader.js         <span class="ln">38</span>  <span class="cmt">편지 열람 + 모달</span>
+│  └─ useClickOutside.js         <span class="ln">17</span>
+├─ <span class="dir">utils/</span>       date.js <span class="ln">44</span> · letter.js <span class="ln">8</span>
+├─ <span class="dir">constants/</span>   emotions.js <span class="ln">24</span> · notes.js <span class="ln">15</span> · views.js <span class="ln">15</span>
+└─ <span class="dir">components/</span>
+   ├─ <span class="dir">common/</span>    Button · Card · Modal · TextField · FilterTabs
+   │              PageHeader · StatusMessage · AuthRequired
+   │              BackButton · GradientHeading · <span class="dir">icons/</span>
+   ├─ <span class="dir">layout/</span>    AppLayout · Header · HeaderMenu · HomeButton
+   │              AuthActions · ViewRouter
+   ├─ <span class="dir">landing/</span>   Landing
+   ├─ <span class="dir">calendar/</span>  CalendarPage · CalendarNav · CalendarGrid
+   │              CalendarCell · WeekdayRow · buildCalendarDays.js
+   ├─ <span class="dir">diary/</span>     DiaryWritePage · EmotionPicker
+   ├─ <span class="dir">letter/</span>    LetterWritePage · SentLettersPage · ReceivedLettersPage
+   │              LetterList · LetterCard · LetterStatusBadge
+   │              LetterDetailModal · NotePicker
+   ├─ <span class="dir">auth/</span>      LoginModal · AuthTabs · LoginFields · SignupFields
+   │              useAuthForm.js · authValidation.js
+   └─ <span class="dir">mypage/</span>    MyPage · ProfileSummary · StatCard · NicknameForm</div>
+
+      <h3>공용 컴포넌트</h3>
+      <p>
+        반복되던 Tailwind 클래스 덩어리를 <code>common/</code>으로 모았다.
+        여러 화면이 같은 컴포넌트를 쓰기 때문에 버튼 하나만 고쳐도 전체에 반영된다.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>컴포넌트</th><th>역할</th><th>주요 props</th><th>쓰이는 곳</th></tr></thead>
+          <tbody>
+            <tr><td><code>Button</code></td><td>그라데이션 버튼</td><td><code>variant</code> pink·purple·gradient·neutral, <code>size</code>, <code>disabled</code></td><td>거의 전 화면</td></tr>
+            <tr><td><code>Card</code></td><td>반투명 흰 패널</td><td><code>className</code></td><td>달력·작성·마이페이지</td></tr>
+            <tr><td><code>Modal</code></td><td>배경 클릭 시 닫히는 오버레이</td><td><code>isOpen</code>, <code>onClose</code></td><td>로그인, 편지 상세</td></tr>
+            <tr><td><code>TextField</code></td><td>라벨·에러 포함 입력</td><td><code>label</code>, <code>error</code>, <code>tone</code></td><td>로그인·회원가입·닉네임</td></tr>
+            <tr><td><code>FilterTabs</code></td><td>건수 뱃지 달린 탭</td><td><code>options</code>[{value,label,count}], <code>tone</code></td><td>보낸·받은 편지함</td></tr>
+            <tr><td><code>StatusMessage</code></td><td>로딩·빈 상태·에러 3종</td><td><code>onRetry</code></td><td>목록·폼 전반</td></tr>
+            <tr><td><code>AuthRequired</code></td><td>로그인 필요 안내</td><td><code>message</code>, <code>onLoginClick</code></td><td>보호된 화면</td></tr>
+            <tr><td><code>PageHeader</code></td><td>제목 + 부제</td><td><code>title</code>, <code>subtitle</code></td><td>편지함·마이페이지</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 핵심 코드 해설 ============ -->
+    <section id="code">
+      <h2>핵심 코드 해설</h2>
+      <p class="sub">읽을 때 헷갈리기 쉬운 네 곳</p>
+
+      <h3>http.js — 모든 요청이 지나는 길목</h3>
+      <p>
+        토큰 부착, 쿠키 동봉, 에러 메시지 변환, 401 감지를 한곳에서 처리한다.
+        각 API 모듈은 경로와 본문만 신경 쓰면 된다.
+      </p>
+      <ul>
+        <li><strong>토큰 보관</strong> — 메모리 캐시 + <code>localStorage</code> 이중. 매 요청마다 스토리지를 읽지 않는다.</li>
+        <li><strong><code>credentials: 'include'</code></strong> — <code>refreshToken</code> 쿠키가 함께 전송되도록 모든 요청에 붙인다.</li>
+        <li><strong>에러 변환</strong> — 상태 코드별 한국어 기본 문구를 두고, 서버가 <code>message</code>나 <code>errors</code>를 주면 그쪽을 우선한다. 네트워크 자체가 실패하면 status 0으로 “서버에 연결할 수 없습니다”를 낸다.</li>
+        <li><strong>401 콜백</strong> — <code>AuthContext</code>가 등록한 핸들러를 호출해 세션을 정리한다. 순환 참조를 피하려고 컨텍스트를 직접 import하지 않고 콜백을 주입받는 구조다.</li>
+      </ul>
+
+      <figure class="code">
+        <figcaption>api/http.js — 요청 본체</figcaption>
+        <pre>export const request = async (path, { method='GET', body, params, auth=true } = {}) =&gt; {
+  const headers = {};
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+
+  const token = getAccessToken();
+  if (auth &amp;&amp; token) headers.Authorization = `Bearer ${token}`;
+
+  let response;
+  try {
+    response = await fetch(buildUrl(path, params), {
+      method, headers,
+      <b>credentials: 'include'</b>,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (cause) {
+    throw new ApiError('서버에 연결할 수 없습니다…', <b>0</b>, cause);
+  }
+
+  const payload = await parseBody(response);
+  if (!response.ok) {
+    if (response.status === <b>401</b> &amp;&amp; unauthorizedHandler) unauthorizedHandler();
+    throw new ApiError(extractMessage(payload, response.status), response.status, payload);
+  }
+  return payload;
+};</pre>
+      </figure>
+
+      <h3>date.js — toISOString을 쓰면 안 되는 이유</h3>
+      <p>
+        백엔드는 <code>LocalDateTime</code>을 쓴다. 타임존이 없는 “벽시계 시각”이다.
+        그런데 <code>toISOString()</code>은 값을 UTC로 바꿔버린다. 한국 시간 기준으로
+        8월 22일 새벽 2시는 UTC로 8월 <strong>21</strong>일 17시가 되어, 저장된 일기의 날짜가
+        하루 밀린다. 그래서 문자열을 직접 조립한다.
+      </p>
+
+      <figure class="code">
+        <figcaption>utils/date.js</figcaption>
+        <pre><i>// 'YYYY-MM-DDTHH:mm:ss' — 타임존 변환 없이 로컬 시각 그대로</i>
+export const toLocalDateTimeString = (date) =&gt; {
+  const d = new Date(date);
+  const pad = (n) =&gt; String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+       + `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};</pre>
+      </figure>
+
+      <h3>useAppNavigation — writeMode가 필요한 이유</h3>
+      <p>
+        달력에서 날짜를 누르면 보통 일기 작성으로 간다. 그런데 사용자가 메뉴에서
+        “편지 보내기”를 고른 뒤에는 같은 클릭이 편지 작성으로 가야 한다.
+        이 “지금 어느 모드인가”를 <code>writeMode</code>가 기억한다.
+      </p>
+
+      <figure class="code">
+        <figcaption>hooks/useAppNavigation.js</figcaption>
+        <pre>const selectDate = useCallback((date) =&gt; {
+  setSelectedDate(date);
+  setCurrentView(writeMode === 'letter' ? VIEWS.LETTER_WRITE : VIEWS.DIARY_WRITE);
+}, [writeMode]);
+
+const selectMenu = useCallback((view) =&gt; {
+  setSelectedDate(null);
+  setCurrentView(view);
+  setWriteMode(view === VIEWS.LETTER_WRITE ? <b>'letter'</b> : <b>'diary'</b>);
+}, []);</pre>
+      </figure>
+
+      <h3>ViewRouter — 화면 보호</h3>
+      <p>
+        일기 작성, 편지 작성, 두 편지함은 로그인이 필요하다. 각 컴포넌트마다 검사하지 않고
+        라우터 한곳에서 목록으로 관리한다.
+      </p>
+
+      <figure class="code">
+        <figcaption>components/layout/ViewRouter.jsx</figcaption>
+        <pre>const PROTECTED_VIEWS = [
+  VIEWS.DIARY_WRITE, VIEWS.LETTER_WRITE, VIEWS.SENT, VIEWS.RECEIVED,
+];
+
+if (PROTECTED_VIEWS.includes(currentView) &amp;&amp; !isAuthenticated) {
+  return &lt;AuthRequired onLoginClick={onLoginClick} /&gt;;
+}</pre>
+      </figure>
+
+      <div class="note">
+        <span class="label">응답 정규화</span>
+        <p>
+          백엔드 DTO를 그대로 쓰지 않고 <code>toDiary</code>, <code>toLetter</code>, <code>toUser</code>로 한 번 변환한다.
+          <code>nickName</code>처럼 대소문자가 다른 필드, 날짜 문자열을 <code>Date</code>로 바꾸는 작업,
+          그리고 Lombok 게터 때문에 <code>isOpened</code>가 <code>opened</code>로 직렬화될 수 있는 상황을
+          이 지점에서 흡수한다. 덕분에 컴포넌트는 항상 같은 모양의 객체만 본다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ API ============ -->
+    <section id="api">
+      <h2>API 레퍼런스</h2>
+      <p class="sub">전체 엔드포인트와 요청·응답 형태</p>
+
+      <p>
+        모든 경로는 <code>/api</code>로 시작한다. 인증이 필요한 요청에는
+        <code>Authorization: Bearer &lt;accessToken&gt;</code> 헤더가 붙는다.
+      </p>
+
+      <h3>인증 · 회원</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>메서드</th><th>경로</th><th>설명</th><th>인증</th><th>프론트</th></tr></thead>
+          <tbody>
+            <tr><td><span class="m post">POST</span></td><td><code>/api/user</code></td><td>회원가입</td><td class="lock">공개</td><td>사용</td></tr>
+            <tr><td><span class="m post">POST</span></td><td><code>/api/user/login</code></td><td>로그인. accessToken 반환 + refreshToken 쿠키</td><td class="lock">공개</td><td>사용</td></tr>
+            <tr><td><span class="m delete">DELETE</span></td><td><code>/api/user/logout</code></td><td>refreshToken 삭제 및 쿠키 만료</td><td class="lock">공개</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/user</code></td><td>내 정보 조회</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m put">PUT</span></td><td><code>/api/user/info</code></td><td>닉네임 수정</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m put">PUT</span></td><td><code>/api/user/info/password</code></td><td>비밀번호 변경</td><td class="lock">🔒 필요</td><td>미사용</td></tr>
+            <tr><td><span class="m delete">DELETE</span></td><td><code>/api/user</code></td><td>회원 탈퇴</td><td class="lock">🔒 필요</td><td>미사용</td></tr>
+            <tr><td><span class="m post">POST</span></td><td><code>/api/token</code></td><td>accessToken 재발급</td><td class="lock">공개</td><td>미사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/health</code></td><td>헬스체크</td><td class="lock">공개</td><td>미사용</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>일기</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>메서드</th><th>경로</th><th>설명</th><th>인증</th><th>프론트</th></tr></thead>
+          <tbody>
+            <tr><td><span class="m post">POST</span></td><td><code>/api/diary</code></td><td>일기 작성. 201 반환</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/diary</code></td><td>내 일기 전체 조회</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m put">PUT</span></td><td><code>/api/diary/{diaryId}</code></td><td>일기 수정</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/diary/{diaryId}</code></td><td>일기 단건 조회</td><td class="lock">🔒 필요</td><td>미사용</td></tr>
+            <tr><td><span class="m delete">DELETE</span></td><td><code>/api/diary/{diaryId}</code></td><td>일기 삭제</td><td class="lock">🔒 필요</td><td>준비됨</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>편지</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>메서드</th><th>경로</th><th>설명</th><th>인증</th><th>프론트</th></tr></thead>
+          <tbody>
+            <tr><td><span class="m post">POST</span></td><td><code>/api/letter</code></td><td>편지 작성. 201 반환</td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/letter?isOpened=</code></td><td>내 편지 목록. 파라미터 <strong>필수</strong></td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/letter/{letterId}</code></td><td>상세 조회 <strong>+ 읽음 처리</strong></td><td class="lock">🔒 필요</td><td>사용</td></tr>
+            <tr><td><span class="m get">GET</span></td><td><code>/api/letter/notification</code></td><td>도착했지만 안 읽은 편지</td><td class="lock">🔒 필요</td><td>준비됨</td></tr>
+            <tr><td><span class="m put">PUT</span></td><td><code>/api/letter/{letterId}</code></td><td>편지 수정</td><td class="lock">🔒 필요</td><td>미사용</td></tr>
+            <tr><td><span class="m delete">DELETE</span></td><td><code>/api/letter/{letterId}</code></td><td>편지 삭제</td><td class="lock">🔒 필요</td><td>준비됨</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>요청 · 응답 예시</h3>
+
+      <figure class="code">
+        <figcaption>POST /api/user/login — 요청</figcaption>
+        <pre>{ "userId": "testuser1", "password": "test1234" }</pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>POST /api/user/login — 응답 200 (+ Set-Cookie: refreshToken)</figcaption>
+        <pre>{
+  "userId": "testuser1",
+  <b>"nickName"</b>: "테스트유저",       <i>// N이 대문자다. toUser에서 nickname으로 변환</i>
+  "role": "ROLE_USER",
+  "email": "testuser1@example.com",
+  "createAt": "2026-08-22T02:31:05",
+  <b>"accessToken"</b>: "eyJhbGciOiJIUzI1NiJ9…"
+}</pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>POST /api/diary — 요청</figcaption>
+        <pre>{
+  "content": "연동 테스트 일기입니다.",
+  "emojiCode": "HAPPY",
+  <b>"createAt"</b>: "2026-08-15T00:00:00"   <i>// 타임존 없는 LocalDateTime</i>
+}</pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>GET /api/diary — 응답 200</figcaption>
+        <pre>[
+  {
+    "diaryId": 1,
+    "content": "연동 테스트 일기입니다.",
+    "createAt": "2026-08-15T00:00:00",
+    "nickname": "테스트유저",
+    "emojiCode": "HAPPY"
+  }
+]</pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>POST /api/letter — 요청</figcaption>
+        <pre>{
+  <b>"title"</b>: "스무 살의 나에게",
+  "content": "미래의 나에게. 잘 지내고 있니?",
+  "noteCode": "PINK",
+  "deliverDate": "2026-12-25T00:00:00"
+}</pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>GET /api/letter/3 — 응답 200 (호출과 동시에 isOpened가 true로 바뀐다)</figcaption>
+        <pre>{
+  "letterId": 3,
+  <b>"title"</b>: "스무 살의 나에게",
+  "content": "미래의 나에게. 잘 지내고 있니?",
+  "deliverDate": "2026-08-22T00:00:00",
+  <b>"isOpened"</b>: true,
+  <b>"isDelivered"</b>: true,
+  "createAt": "2026-08-22T02:33:10",
+  "noteCode": "PINK",
+  "nickname": "테스트유저"
+}</pre>
+      </figure>
+
+      <div class="note">
+        <span class="label">boolean 필드 이름 주의</span>
+        <p>
+          Lombok <code>@Getter</code>가 <code>private boolean isOpened</code>에 대해 <code>isOpened()</code>를 만들면
+          Jackson은 <code>is</code>를 떼고 <code>opened</code>로 직렬화한다. 그래서 DTO에
+          <code>@JsonProperty("isOpened")</code>를 명시해 이름을 고정했고, 프론트 <code>toLetter</code>도
+          <code>response.isOpened ?? response.opened</code>로 양쪽을 모두 받는다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 백엔드 수정 내역 ============ -->
+    <section id="backend">
+      <h2>백엔드 수정 내역</h2>
+      <p class="sub">프론트 연동 과정에서 발견해 고친 것들</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>대상</th><th>문제</th><th>조치</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>DiaryService.save</code></td>
+              <td><span class="status bad">치명</span> 빌더가 <code>createAt</code>을 <code>null</code>로 덮어써 <code>NOT NULL</code> 위반. 일기 저장이 항상 실패했다</td>
+              <td>요청값이 없으면 현재 시각으로 채우도록 수정</td>
+            </tr>
+            <tr>
+              <td><code>DiaryService.findByUserId</code></td>
+              <td><span class="status bad">보안</span> 이름과 달리 <code>findAll()</code>을 반환해 다른 사용자의 일기까지 내려갔다</td>
+              <td><code>findByUser_UserId(userId)</code> 결과를 반환</td>
+            </tr>
+            <tr>
+              <td><code>LetterService</code> · <code>LetterController</code></td>
+              <td><span class="status bad">보안</span> 편지 목록과 상세가 사용자 구분 없이 조회됐다</td>
+              <td><code>Principal</code> 기준으로 범위 제한. 저장소에 사용자 한정 메서드 추가</td>
+            </tr>
+            <tr>
+              <td><code>DiaryResponse</code> · <code>LetterResponse</code></td>
+              <td>응답에 <code>diaryId</code>, <code>letterId</code>가 없어 프론트가 수정·열람을 호출할 수 없었다</td>
+              <td>id 노출. <code>LetterResponse</code>에 <code>isDelivered</code>도 추가하고 직렬화 이름 고정</td>
+            </tr>
+            <tr>
+              <td><code>WebSecurityConfig</code></td>
+              <td>CORS 설정이 없어 프록시 없이는 프론트가 호출할 수 없었다</td>
+              <td><code>CorsConfigurationSource</code> 빈 추가</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>연동 검증 결과</h3>
+      <p>실제 서버를 띄우고 브라우저로 전 과정을 확인했다.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>동작</th><th>요청</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td>회원가입</td><td><code>POST /api/user</code></td><td><span class="status ok">200</span></td></tr>
+            <tr><td>자동 로그인</td><td><code>POST /api/user/login</code></td><td><span class="status ok">200</span> Redis 저장 정상</td></tr>
+            <tr><td>일기 저장</td><td><code>POST /api/diary</code></td><td><span class="status ok">201</span></td></tr>
+            <tr><td>달력 반영</td><td><code>GET /api/diary</code></td><td><span class="status ok">이모지 표시</span></td></tr>
+            <tr><td>편지 발송</td><td><code>POST /api/letter</code></td><td><span class="status ok">201</span></td></tr>
+            <tr><td>편지 열람</td><td><code>GET /api/letter/3</code></td><td><span class="status ok">200</span> 읽음 전환 확인</td></tr>
+            <tr><td>마이페이지</td><td><code>GET /api/user</code></td><td><span class="status ok">통계 1/1/1</span></td></tr>
+            <tr><td>닉네임 변경</td><td><code>PUT /api/user/info</code></td><td><span class="status warn">미검증</span></td></tr>
+            <tr><td>편지 제목 저장 <span class="status ok">08.27</span></td><td><code>POST /api/letter</code></td><td><span class="status ok">201</span> 목록·모달에 제목 표시</td></tr>
+            <tr><td>제목 없는 옛 편지 <span class="status ok">08.27</span></td><td><code>GET /api/letter</code></td><td><span class="status ok">본문 발췌로 대체됨</span></td></tr>
+            <tr><td>잘못된 토큰 <span class="status ok">08.27</span></td><td><code>GET /api/user</code></td><td><span class="status ok">401</span> (기존 403)</td></tr>
+            <tr><td>토큰 자동 재발급 <span class="status ok">08.27</span></td><td><code>POST /api/token</code></td><td><span class="status ok">201</span> 401 2건에 재발급 1회, 재시도 200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 변경 이력 ============ -->
+    <section id="changelog">
+      <h2>변경 이력</h2>
+      <p class="sub">2026.08.27 – 09.03 — 문서에 적어둔 이슈를 해결한 작업 기록</p>
+
+      <p>
+        8월 23일 이 핸드북을 쓰면서 정리한 이슈들을 실제 코드에 반영했다.
+        각 항목은 <strong>왜 문제였는지</strong>, <strong>어떻게 고쳤는지</strong>,
+        <strong>무엇이 달라지는지</strong> 순으로 적었다.
+      </p>
+
+      <div class="changelog">
+
+        <article class="change">
+          <header>
+            <h3>배포 워크플로 자동 트리거 중단</h3>
+            <span class="tag ops">운영</span>
+          </header>
+          <p class="files">.github/workflows/gradle.yml</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                트리거가 <code>push: branches: ["dev"]</code>인데 작업 브랜치가 <code>dev</code>다.
+                EC2/DockerHub 배포는 끊긴 상태라 코드를 push할 때마다 워크플로가 돌고 실패한다.
+                실패 알림이 쌓이면 정작 진짜 문제를 놓치게 된다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                워크플로를 삭제하지 않고 트리거만 <code>workflow_dispatch</code>로 바꿔
+                <strong>수동 실행만 가능한 상태</strong>로 두었다. 되돌리는 방법을 주석으로 남겨
+                나중에 배포를 살릴 때 그대로 복원할 수 있게 했다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p><code>dev</code>에 push해도 배포가 돌지 않는다. Actions 탭에서 직접 실행할 때만 동작한다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>.github/workflows/gradle.yml</figcaption>
+            <pre><i># [배포 일시 중단] 2026-08-27</i>
+<i># 배포를 다시 켜려면 아래 workflow_dispatch를 지우고 이 블록으로 되돌린다.</i>
+<i>#   on:</i>
+<i>#     push:</i>
+<i>#       branches: ["dev"]</i>
+on:
+  <b>workflow_dispatch:</b></pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>토큰 자동 재발급이 동작하도록 수정</h3>
+            <span class="tag feature">기능</span>
+          </header>
+          <p class="files">controller/TokenApiController.java · src/api/http.js</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                <code>POST /api/token</code>이 <code>refreshToken</code>을 <strong>요청 본문으로만</strong> 받았다.
+                그런데 그 토큰은 로그인 시 <code>httpOnly</code> 쿠키로 내려가기 때문에
+                브라우저의 자바스크립트가 값을 읽을 수 없다. 즉 프런트에서는 재발급 요청 자체를 만들 수 없었다.
+              </p>
+              <p>
+                결과적으로 accessToken 유효기간 1시간이 지나면 사용자가 아무 잘못 없이 로그아웃됐다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                <strong>백엔드</strong>는 쿠키를 먼저 읽고, 없을 때만 본문 값을 쓰도록 바꿨다.
+                쿠키를 쓰지 않는 모바일 클라이언트를 위해 기존 방식도 남겨두었다. 둘 다 없으면 401을 반환한다.
+              </p>
+              <p>
+                <strong>프런트</strong>는 <code>http.js</code>에서 401을 받으면 재발급을 한 번 시도하고
+                원래 요청을 재시도한다. 재발급까지 실패했을 때만 세션을 정리한다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>토큰이 만료돼도 사용자는 눈치채지 못하고 하던 작업을 이어간다.</p></dd>
+          </dl>
+
+          <figure class="code">
+            <figcaption>TokenApiController.java — 쿠키 우선, 본문은 대체 수단</figcaption>
+            <pre>@PostMapping("/api/token")
+public ResponseEntity&lt;TokenResponse&gt; createToken(
+        <b>@CookieValue(value = "refreshToken", required = false) String cookieRefreshToken</b>,
+        @RequestBody(required = false) TokenRequest request) {
+
+    String refreshToken = hasText(cookieRefreshToken)
+            ? cookieRefreshToken
+            : (request != null ? request.getRefreshToken() : null);
+
+    if (!hasText(refreshToken)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new TokenResponse(tokenService.createNewAccessToken(refreshToken)));
+}</pre>
+          </figure>
+
+          <p>
+            프런트에서 신경 쓴 것은 <strong>동시 요청</strong>과 <strong>무한 재시도</strong> 두 가지다.
+            달력 화면은 일기와 편지를 동시에 부르기 때문에 401이 한꺼번에 여러 개 올 수 있다.
+            그때마다 재발급을 호출하면 토큰이 여러 번 갈린다. 그래서 진행 중인 Promise를 공유해
+            <strong>재발급은 한 번만</strong> 일어나게 했다.
+          </p>
+
+          <figure class="code">
+            <figcaption>api/http.js — 재발급 요청 공유</figcaption>
+            <pre><i>// 동시에 여러 요청이 401을 받아도 재발급은 한 번만 하도록 Promise를 공유한다.</i>
+let <b>refreshPromise</b> = null;
+
+const refreshAccessToken = () =&gt; {
+  if (!refreshPromise) {
+    refreshPromise = request('/token', { method: 'POST', body: {}, auth: false, <b>retry: false</b> })
+      .then((data) =&gt; {
+        const token = data?.accessToken;
+        if (!token) throw new ApiError('재발급 응답에 accessToken이 없습니다.', 0, data);
+        setAccessToken(token);
+        return token;
+      })
+      .finally(() =&gt; { refreshPromise = null; });
+  }
+  return refreshPromise;
+};</pre>
+          </figure>
+
+          <p>
+            재시도는 <code>retry</code> 플래그로 딱 한 번만 허용한다. 재발급 요청 자체에는
+            <code>retry: false</code>가 붙어 있어 그 요청이 401을 받아도 다시 재발급을 시도하지 않는다.
+            또 <strong>애초에 토큰이 없던 요청</strong>은 재발급해도 소용없으므로 건너뛴다.
+          </p>
+
+          <figure class="code">
+            <figcaption>api/http.js — 401 처리 분기</figcaption>
+            <pre>if (response.status === 401 &amp;&amp; auth) {
+  <i>// 보낼 토큰이 있었는데 거부당한 경우에만 재발급을 시도한다.</i>
+  if (<b>retry &amp;&amp; getAccessToken()</b>) {
+    try {
+      await refreshAccessToken();
+      return request(path, { method, body, params, auth, <b>retry: false</b> });
+    } catch {
+      <i>// 재발급 실패 -&gt; 아래에서 세션 정리</i>
+    }
+  }
+  if (unauthorizedHandler) unauthorizedHandler();
+}</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>일기 단건 접근에 소유자 검사 추가</h3>
+            <span class="tag security">보안</span>
+          </header>
+          <p class="files">service/DiaryService.java · controller/DiaryController.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                <code>GET</code> · <code>PUT</code> · <code>DELETE /api/diary/{id}</code>가
+                <code>findById(id)</code>만 호출했다. 로그인만 되어 있으면
+                <strong>id를 바꿔가며 남의 일기를 읽고 고치고 지울 수 있었다.</strong>
+                목록 조회는 앞서 사용자 기준으로 고쳤지만 단건 접근이 빠져 있었다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                단건 접근을 <code>findOwnedDiary</code> private 메서드 하나로 모으고,
+                이미 저장소에 있던 <code>findByDiaryIdAndUser_UserId</code>를 쓰게 했다.
+                한 곳만 지나가므로 나중에 메서드를 추가해도 검사를 빠뜨리기 어렵다.
+              </p>
+              <p>
+                컨트롤러는 <code>Principal</code>에서 아이디를 꺼내 넘긴다.
+                삭제도 <code>deleteById</code> 대신 조회 후 <code>delete</code>로 바꿔 같은 검사를 태웠다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>남의 일기 id로 요청하면 조회되지 않아 거부된다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>DiaryService.java</figcaption>
+            <pre><i>// id만 알면 남의 일기를 건드릴 수 있었기 때문에, 단건 접근은 모두 이 메서드를 거친다.</i>
+private Diary <b>findOwnedDiary</b>(Long id, String userId) {
+    return diaryRepository.findByDiaryIdAndUser_UserId(id, userId)
+            .orElseThrow(() -&gt; new IllegalArgumentException("DiaryId not found: " + id));
+}
+
+@Transactional
+public Diary updateById(Long id, UpdateDiaryRequest request, <b>String userId</b>) {
+    Diary diary = findOwnedDiary(id, userId);
+    diary.update(request.getContent(), request.getCreateAt(), request.getEmojiCode());
+    return diary;
+}
+
+@Transactional
+public void deleteById(Long id, <b>String userId</b>) {
+    diaryRepository.delete(findOwnedDiary(id, userId));
+}</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>편지 제목 컬럼 추가</h3>
+            <span class="tag feature">기능</span>
+          </header>
+          <p class="files">entity/Letter.java · dto/letter/* · LetterService · LetterWritePage · LetterCard · LetterDetailModal</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                <code>Letter</code> 엔티티에 제목 컬럼이 없어서 편지함 목록에서 본문 앞 40자를 잘라
+                제목처럼 보여주고 있었다. 긴 편지일수록 목록에서 어떤 편지인지 알아보기 어려웠다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                엔티티부터 화면까지 <code>title</code>을 한 줄로 관통시켰다.
+                <strong>기존 편지에는 제목이 없으므로 컬럼을 nullable로 두었다.</strong>
+                <code>NOT NULL</code>로 만들면 <code>ddl-auto=update</code>가 기존 행 때문에 컬럼 추가에 실패한다.
+              </p>
+              <p>
+                목록 카드는 제목이 있으면 제목을, 없으면 예전처럼 본문 발췌를 보여준다.
+                덕분에 제목 없이 저장된 편지도 그대로 읽힌다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>편지 작성 폼에 제목 칸이 생기고, 목록과 상세 모달에 제목이 표시된다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>entity/Letter.java</figcaption>
+            <pre><i>// 기존 편지에는 제목이 없으므로 nullable로 둔다. (ddl-auto=update로 컬럼만 추가됨)</i>
+@Column(name = "title")
+private String <b>title</b>;</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>components/letter/LetterCard.jsx — 옛 편지 호환</figcaption>
+            <pre><i>/** 제목이 없던 시절에 쓴 편지를 위해 본문 앞부분을 요약해 제목 자리에 채운다. */</i>
+const displayTitle = (letter) =&gt; letter.title?.trim() || <b>summarize(letter.content)</b>;</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>Redis 설정을 실제로 읽히는 키로 이동</h3>
+            <span class="tag config">설정</span>
+          </header>
+          <p class="files">resources/application.yml · docker-compose.yml</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                <code>application.yml</code>에 <code>jwt.redis.host/port</code>가 적혀 있었지만
+                <strong>어디에서도 읽지 않는 값</strong>이었다. <code>JwtProperties</code>에 redis 필드가 없고,
+                Spring Data Redis는 <code>spring.data.redis.*</code>를 본다.
+                지금까지는 기본값 <code>localhost:6379</code>와 우연히 일치해서 동작했을 뿐이다.
+              </p>
+              <p>
+                더 큰 문제는 배포 환경이었다. Docker에서 <code>spring-be</code>와 <code>redis</code>는
+                서로 다른 컨테이너라 <code>localhost</code>로는 닿을 수 없다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                설정을 <code>spring.data.redis</code>로 옮기면서 환경변수로 덮어쓸 수 있게 했다.
+                로컬에서는 변수가 없으니 기본값 <code>localhost</code>가 그대로 쓰이고,
+                docker-compose에는 <code>REDIS_HOST: redis</code>를 넣어 서비스 이름으로 붙게 했다.
+                읽히지 않던 <code>jwt.redis</code> 블록은 제거했다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>로컬 동작은 그대로이고, 배포 시 Redis 연결이 실제로 성립한다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>application.yml</figcaption>
+            <pre>spring:
+  <b>data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}</b>
+
+jwt:
+  issuer: ${JWT_ISSUER}
+  secret_key: ${JWT_SECRETKEY}
+  expiration:
+    access: 3600000
+    refresh: 86400000
+  <i># redis: 블록 삭제 — 아무도 읽지 않던 설정이었다</i></pre>
+          </figure>
+        </article>
+
+
+        <article class="change">
+          <header>
+            <h3>인증 실패 시 403 대신 401 반환</h3>
+            <span class="tag security">보안</span>
+          </header>
+          <p class="files">config/WebSecurityConfig.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                위의 토큰 재발급을 붙이고 브라우저에서 확인해 보니 <strong>재발급이 아예 발동하지 않았다.</strong>
+                토큰을 일부러 망가뜨려 요청했더니 서버가 <code>401</code>이 아니라 <code>403</code>을 돌려주고 있었다.
+                프런트는 401에만 재발급을 걸도록 만들었으니 당연히 아무 일도 일어나지 않았다.
+              </p>
+              <p>
+                원인은 Spring Security에 <code>AuthenticationEntryPoint</code>를 지정하지 않은 것이었다.
+                지정하지 않으면 기본값인 <code>Http403ForbiddenEntryPoint</code>가 쓰인다.
+                의미상으로도 “인증되지 않음”은 401, “인증됐지만 권한 없음”이 403이므로 잘못된 상태였다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                <code>HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)</code>를 지정해
+                인증되지 않은 요청은 401을 받도록 했다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>토큰 만료와 권한 부족을 프런트가 구분할 수 있게 됐고, 재발급 로직이 실제로 동작한다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>WebSecurityConfig.java</figcaption>
+            <pre><i>// 인증이 없거나 토큰이 유효하지 않으면 401을 반환한다.</i>
+<i>// 진입점을 지정하지 않으면 스프링 기본값(Http403ForbiddenEntryPoint)이 403을 내보내는데,</i>
+<i>// 그러면 프런트가 "토큰 만료"와 "권한 없음"을 구분하지 못해 자동 재발급을 걸 수 없다.</i>
+.exceptionHandling(ex -&gt; ex
+        .authenticationEntryPoint(new <b>HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)</b>)
+)</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>서버 오류가 401로 둔갑하던 문제</h3>
+            <span class="tag config">설정</span>
+          </header>
+          <p class="files">config/WebSecurityConfig.java · resources/application.yml</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                검증 도중 로그인이 계속 실패했는데, 화면에는 “권한이 없습니다”만 떴다.
+                서버 로그를 보니 진짜 원인은 <code>RedisConnectionFailureException</code>이었다.
+              </p>
+              <p>
+                내부 오류로 500이 나면 서블릿이 <code>/error</code>로 재디스패치하는데,
+                <code>/error</code>가 <code>anyRequest().authenticated()</code>에 걸려 인증 진입점에 가로채였다.
+                그래서 <strong>모든 서버 오류가 401(과거에는 403)로 바뀌어</strong> 원인을 숨기고 있었다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p><code>/error</code>를 <code>permitAll</code>에 추가해 실제 오류 응답이 그대로 나가게 했다.</p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>서버 오류가 500으로 정직하게 보고돼 원인 파악이 빨라진다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>WebSecurityConfig.java</figcaption>
+            <pre><i>// 서버 오류가 /error로 재디스패치될 때 인증에 막히면</i>
+<i>// 진짜 원인(500)이 401로 둔갑해 디버깅이 어려워진다.</i>
+.requestMatchers(<b>"/error"</b>).permitAll()</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>Redis 기본 호스트를 127.0.0.1로</h3>
+            <span class="tag config">설정</span>
+          </header>
+          <p class="files">resources/application.yml</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                Redis가 WSL 안에서 정상 동작하고 윈도우에서 <code>127.0.0.1:6379</code>로 접속도 되는데,
+                정작 스프링만 <code>Connection refused</code>를 냈다.
+              </p>
+              <p>
+                윈도우에서 <code>localhost</code>는 <code>::1</code>(IPv6)로 먼저 해석되는데,
+                <strong>WSL의 포트 포워딩은 IPv4만 중계한다.</strong>
+                그래서 <code>localhost</code>로 붙으면 IPv6 주소를 먼저 시도하다 실패했다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                기본값을 <code>127.0.0.1</code>로 바꿔 IPv4를 명시했다.
+                도커 배포에서는 compose가 <code>REDIS_HOST=redis</code>로 덮어쓰므로 영향이 없다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>WSL Redis에 안정적으로 붙는다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>application.yml</figcaption>
+            <pre>  data:
+    redis:
+      <i># 윈도우에서 localhost는 ::1(IPv6)을 먼저 시도하는데 WSL 포워딩은 IPv4만 중계한다.</i>
+      host: ${REDIS_HOST:<b>127.0.0.1</b>}
+      port: ${REDIS_PORT:6379}</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>Redis를 WSL systemd 서비스로 등록 (환경 설정)</h3>
+            <span class="tag ops">운영</span>
+          </header>
+          <p class="files">WSL Ubuntu-22.04 · 저장소 파일 변경 없음</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                검증하는 동안 Redis가 반복해서 죽었다. 원인은 Redis가 아니라 <strong>WSL이었다.</strong>
+                WSL2는 아무도 쓰지 않으면 가상머신을 내리는데, 그때 수동으로 띄운 데몬도 함께 사라진다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                이 배포판은 systemd가 켜져 있어서 서비스로 등록할 수 있었다.
+                <code>wsl -u root</code>는 비밀번호 없이 들어가지므로 sudo 비밀번호도 필요 없었다.
+              </p>
+              <p>
+                기본 <code>redis.conf</code>는 <code>127.0.0.1</code>에만 바인딩해 윈도우에서 닿지 않으므로
+                <code>bind 0.0.0.0</code>으로 바꿨다. (원본은 <code>redis.conf.bak</code>으로 백업)
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>WSL이 뜰 때마다 Redis가 자동으로 시작된다. 수동 실행 명령을 외울 필요가 없다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>한 번만 실행하면 되는 설정</figcaption>
+            <pre>wsl -d Ubuntu-22.04 -u root -- systemctl enable --now redis-server</pre>
+          </figure>
+          <div class="note caution">
+            <span class="label">남은 제약</span>
+            <p>
+              WSL 자체가 유휴 상태로 내려가면 Redis도 함께 멈춘다.
+              <code>wsl</code> 명령을 한 번 실행하면 다시 부팅되면서 서비스가 자동으로 살아난다.
+              완전히 막으려면 <code>%UserProfile%\\.wslconfig</code>의 <code>[wsl2]</code>에
+              <code>vmIdleTimeout=-1</code>을 넣으면 된다. 전역 설정이라 적용하지 않았다.
+            </p>
+          </div>
+        </article>
+
+
+        <article class="change">
+          <header>
+            <h3>오류 응답 분리 — 사용자에겐 안내, 개발자에겐 원인</h3>
+            <span class="tag feature">기능</span>
+          </header>
+          <p class="files">config/GlobalExceptionHandler.java (신규) · dto/error/ErrorResponse.java (신규) · run-local.ps1</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                Redis가 죽었을 때 로그인이 실패하는데, 사용자 화면에는 “권한이 없습니다”나
+                “서버에 문제가 발생했습니다”만 떴다. <strong>사용자는 뭘 해야 할지 모르고,
+                개발자는 원인을 찾으려면 스택트레이스를 뒤져야 했다.</strong>
+              </p>
+              <p>
+                반대 방향의 문제도 있었다. 비밀번호가 틀리면 서비스가
+                <code>IllegalArgumentException("Invalid Password Your Id : testuser1")</code>을 던지는데,
+                이런 메시지가 그대로 클라이언트에 나가면 <strong>아이디 존재 여부가 노출</strong>된다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                <code>@RestControllerAdvice</code>로 예외를 한곳에서 받아 두 갈래로 나눴다.
+                <strong>응답에는 사용자가 읽을 문장만</strong> 담고,
+                <strong>콘솔에는 원인과 조치 방법을</strong> 남긴다.
+              </p>
+              <p>
+                콘솔 메시지는 스택을 끝까지 타고 내려가 근본 원인을 뽑아내고,
+                “무엇을 실행하면 되는지”까지 함께 찍는다. 로그만 봐도 조치가 가능하도록 했다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>사용자는 내부 사정을 모른 채 안내만 받고, 개발자는 로그 한 줄로 원인을 안다.</p></dd>
+          </dl>
+
+          <div class="scroll">
+            <table>
+              <thead><tr><th>상황</th><th>상태</th><th>사용자가 보는 문구</th></tr></thead>
+              <tbody>
+                <tr><td>Redis 연결 실패</td><td><span class="status warn">503</span></td><td>서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</td></tr>
+                <tr><td>DB 접근 실패</td><td><span class="status warn">503</span></td><td>서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</td></tr>
+                <tr><td>토큰 검증 실패</td><td><span class="status warn">401</span></td><td>다시 로그인해주세요.</td></tr>
+                <tr><td>로그인 실패 (아이디·비밀번호)</td><td><span class="status warn">401</span></td><td>아이디 또는 비밀번호가 올바르지 않습니다.</td></tr>
+                <tr><td>현재 비밀번호 불일치</td><td><span class="status warn">401</span></td><td>현재 비밀번호가 올바르지 않습니다.</td></tr>
+                <tr><td>그 밖의 잘못된 입력</td><td><span class="status warn">400</span></td><td>요청을 처리할 수 없습니다. 입력값을 확인해주세요.</td></tr>
+                <tr><td>그 외 모든 예외</td><td><span class="status bad">500</span></td><td>서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="code">
+            <figcaption>config/GlobalExceptionHandler.java — Redis 장애</figcaption>
+            <pre>@ExceptionHandler(RedisConnectionFailureException.class)
+public ResponseEntity&lt;ErrorResponse&gt; handleRedisDown(RedisConnectionFailureException e,
+                                                     HttpServletRequest request) {
+    logFailure("REDIS 연결 실패", request, e,
+            "Redis가 실행 중인지 확인하세요. "
+                    + "로컬(WSL): wsl -d Ubuntu-22.04 -u root -- systemctl start redis-server / "
+                    + "확인: redis-cli ping. "
+                    + "접속 주소는 spring.data.redis.host(기본 127.0.0.1:6379)로 설정합니다.");
+
+    return build(HttpStatus.SERVICE_UNAVAILABLE, <b>MSG_UNAVAILABLE</b>, request);
+}</pre>
+          </figure>
+
+          <p>
+            원인을 정확히 찍으려면 스프링이 감싼 예외가 아니라 <strong>맨 아래 진짜 원인</strong>이 필요하다.
+            <code>RedisConnectionFailureException</code>만 찍으면 “Unable to connect to Redis”라는 뻔한 말뿐이지만,
+            끝까지 내려가면 <code>ConnectException: Connection refused</code>가 나온다.
+          </p>
+
+          <figure class="code">
+            <figcaption>근본 원인 추출</figcaption>
+            <pre><i>/** 스택을 타고 내려가 가장 근본 원인을 찾는다. (ConnectException 등) */</i>
+private String rootCauseOf(Throwable e) {
+    Throwable cause = e;
+    while (cause.getCause() != null &amp;&amp; <b>cause.getCause() != cause</b>) {   <i>// 자기 참조 방어</i>
+        cause = cause.getCause();
+    }
+    return cause.getClass().getSimpleName() + ": " + cause.getMessage();
+}</pre>
+          </figure>
+
+          <h4>실제 콘솔 출력</h4>
+          <figure class="code">
+            <figcaption>Redis를 끄고 로그인했을 때 서버 콘솔</figcaption>
+            <pre>ERROR c.y.e.config.GlobalExceptionHandler :
+
+┌─ REDIS 연결 실패 ────────────────────────────────
+│ 요청 : POST /api/user/login
+│ 원인 : <b>ConnectException: Connection refused: getsockopt</b>
+│ 조치 : Redis가 실행 중인지 확인하세요. 로컬(WSL): wsl -d Ubuntu-22.04
+│        -u root -- systemctl start redis-server / 확인: redis-cli ping ...
+└──────────────────────────────────────────────────
+
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+    at org.springframework.data.redis.connection.lettuce...  <i>(스택트레이스 계속)</i></pre>
+          </figure>
+
+          <figure class="code">
+            <figcaption>같은 순간 사용자가 받는 응답</figcaption>
+            <pre>HTTP <b>503</b>
+{
+  "status": 503,
+  "message": "<b>서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.</b>",
+  "path": "/api/user/login",
+  "timestamp": "2026-08-31T18:36:20.367"
+}</pre>
+          </figure>
+
+          <div class="note">
+            <span class="label">로그 레벨을 구분했다</span>
+            <p>
+              서버 장애(Redis·DB·예상 못한 예외)는 <code>log.error</code>로 스택트레이스까지 남기고,
+              토큰 만료나 비밀번호 오류처럼 <strong>정상적인 흐름</strong>은 <code>log.warn</code>으로 한 줄만 남긴다.
+              사용자가 비밀번호를 틀릴 때마다 스택트레이스가 쌓이면 진짜 장애가 묻히기 때문이다.
+            </p>
+          </div>
+
+          <h4>로그인 실패는 전용 예외로 분리했다</h4>
+          <p>
+            처음에는 로그인 실패도 <code>IllegalArgumentException</code>에 묶여
+            “요청을 처리할 수 없습니다”라는 막연한 문구가 나갔다. 로그인 폼에서는 도움이 되지 않는다.
+            그래서 <strong>사용자용 문구와 로그용 상세를 따로 들고 다니는</strong> 예외를 만들었다.
+          </p>
+          <figure class="code">
+            <figcaption>exception/InvalidCredentialsException.java</figcaption>
+            <pre>public class InvalidCredentialsException extends RuntimeException {
+    private final String <b>userMessage</b>;   <i>// 클라이언트에 그대로 나가는 문장</i>
+
+    public InvalidCredentialsException(String userMessage, String <b>detailForLog</b>) {
+        super(detailForLog);                <i>// getMessage() — 서버 로그에만 남는다</i>
+        this.userMessage = userMessage;
+    }
+}</pre>
+          </figure>
+          <p>
+            핵심은 <strong>아이디가 없을 때와 비밀번호가 틀릴 때 같은 문구를 내보내는 것</strong>이다.
+            다르게 응답하면 아이디가 존재하는지 여부를 외부에서 알아낼 수 있다.
+          </p>
+          <figure class="code">
+            <figcaption>service/UserService.java</figcaption>
+            <pre>private static final String <b>LOGIN_FAILED_MESSAGE</b> = "아이디 또는 비밀번호가 올바르지 않습니다.";
+
+<i>// 아이디가 없을 때와 비밀번호가 틀릴 때 "같은" 문구를 내보낸다.</i>
+User users = userRepository.findById(userId)
+        .orElseThrow(() -&gt; new InvalidCredentialsException(
+                LOGIN_FAILED_MESSAGE, "로그인 실패 - 존재하지 않는 userId: " + userId));
+
+if (!passwordEncoder.matches(password, users.getPassword())) {
+    throw new InvalidCredentialsException(
+            LOGIN_FAILED_MESSAGE, "로그인 실패 - 비밀번호 불일치: " + userId);
+}</pre>
+          </figure>
+          <div class="note">
+            <span class="label">검증 결과</span>
+            <p>
+              틀린 비밀번호와 없는 아이디, 두 요청의 응답이 <strong>글자 하나까지 동일</strong>했다.
+              같은 순간 서버 콘솔에는 각각 이렇게 남았다.
+            </p>
+            <figure class="code" style="margin-top:12px;">
+              <pre>WARN GlobalExceptionHandler : [POST /api/user/login] 로그인 실패 - <b>비밀번호 불일치</b>: testuser1
+WARN GlobalExceptionHandler : [POST /api/user/login] 로그인 실패 - <b>존재하지 않는 userId</b>: nosuchuser</pre>
+            </figure>
+          </div>
+
+          <div class="note caution">
+            <span class="label">덤 — PowerShell 콘솔 인코딩</span>
+            <p>
+              로그 메시지가 한글이라 <code>run-local.ps1</code>로 띄우면 콘솔이 cp949일 때 깨진다.
+              스크립트 앞부분에서 콘솔 출력 인코딩을 UTF-8로 맞추는 두 줄을 추가했다.
+              IntelliJ 콘솔은 원래 UTF-8이라 영향이 없다.
+            </p>
+          </div>
+        </article>
+
+
+        <article class="change">
+          <header>
+            <h3>WSL Redis가 끊기는 문제를 스크립트에서 처리</h3>
+            <span class="tag ops">운영</span>
+          </header>
+          <p class="files">EmoLetter_BE/run-local.ps1</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                로컬 개발 내내 Redis가 반복해서 끊겼다. 원인은 Redis가 아니라 <strong>WSL2였다.</strong>
+                WSL2는 <code>vmIdleTimeout</code> 기본값에 따라 <strong>약 1분간 아무도 쓰지 않으면
+                가상머신을 통째로 내린다.</strong> 그 안에서 돌던 Redis도 함께 사라진다.
+              </p>
+              <p>
+                증상이 헷갈렸던 이유는 <strong>일부 요청만 실패</strong>했기 때문이다.
+                비밀번호가 틀린 로그인은 Redis에 닿기 전에 끝나서 401이 정상적으로 나오는데,
+                <strong>성공하는 로그인만</strong> refreshToken 저장 단계에서 503이 났다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                전역 설정(<code>%UserProfile%\\.wslconfig</code>의 <code>vmIdleTimeout</code>)을 바꾸면
+                해결되지만, 그러면 <strong>모든 WSL 배포판이 항상 메모리를 붙잡고</strong> 있게 된다.
+                이 프로젝트 하나 때문에 시스템 전체 동작을 바꾸는 건 과했다.
+              </p>
+              <p>
+                대신 <code>run-local.ps1</code>이 <strong>두 단계</strong>로 처리하게 했다.
+              </p>
+              <ul>
+                <li><strong>기동 전</strong> — 6379가 죽어 있으면 WSL에 명령을 하나 보내 깨운다.
+                    <code>redis-server</code>가 systemd 서비스로 등록돼 있으므로 부팅과 함께 따라 올라온다.</li>
+                <li><strong>기동 중</strong> — WSL 안에 <code>sleep</code> 프로세스를 하나 띄워
+                    <strong>서버가 도는 동안만</strong> VM을 붙잡아 둔다. 스크립트가 끝나면 정리한다.</li>
+              </ul>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>개발 세션 동안 Redis가 끊기지 않고, 스크립트를 끄면 WSL도 평소대로 잠든다.</p></dd>
+          </dl>
+
+          <figure class="code">
+            <figcaption>run-local.ps1 — 기동 전 깨우기</figcaption>
+            <pre><i># WSL2는 1분 정도 아무도 쓰지 않으면 가상머신을 통째로 내린다.</i>
+<i># WSL에 명령을 하나 보내면 다시 부팅되고, redis-server가 systemd 서비스로</i>
+<i># 등록돼 있으므로 자동으로 따라 올라온다.</i>
+if (-not (Test-Port 6379)) {
+    if (Get-Command wsl.exe -ErrorAction SilentlyContinue) {
+        Write-Host "Redis가 응답하지 않습니다. WSL을 깨우는 중..."
+        try { wsl.exe -u root -- systemctl start redis-server 2&gt;&amp;1 | Out-Null } catch { }
+        <i># 부팅과 포트 포워딩이 잡힐 때까지 최대 5초 기다린다.</i>
+        for ($i = 0; $i -lt 10 -and -not (Test-Port 6379); $i++) { Start-Sleep -Milliseconds 500 }
+    }
+}</pre>
+          </figure>
+
+          <figure class="code">
+            <figcaption>run-local.ps1 — 서버가 도는 동안 붙잡아 두기</figcaption>
+            <pre><i># 전역 설정(.wslconfig)을 건드리는 대신, 이 스크립트가 사는 동안만</i>
+<i># WSL 안에 프로세스를 하나 띄워 VM을 붙잡아 둔다.</i>
+<i># 혹시 정리에 실패해도 8시간 뒤에는 스스로 사라진다.</i>
+$keepAlive = Start-Process wsl.exe -ArgumentList '-e','sleep','<b>28800</b>' `
+                           -WindowStyle Hidden -PassThru
+
+try {
+    &amp; .\\gradlew.bat bootRun --console=plain
+} <b>finally</b> {
+    if ($keepAlive -and -not $keepAlive.HasExited) {
+        Stop-Process -Id $keepAlive.Id -Force -ErrorAction SilentlyContinue
+    }
+}</pre>
+          </figure>
+
+          <div class="note">
+            <span class="label">한 번만 해두면 되는 사전 작업</span>
+            <p>
+              위 방식은 <code>redis-server</code>가 WSL의 systemd 서비스로 등록돼 있다는 전제 위에 있다.
+              등록은 한 번만 하면 되고, <code>wsl -u root</code>는 비밀번호 없이 들어가므로 sudo 암호도 필요 없다.
+            </p>
+            <figure class="code" style="margin-top:12px;">
+              <pre>wsl -u root -- systemctl enable --now redis-server</pre>
+            </figure>
+          </div>
+
+          <div class="note caution">
+            <span class="label">IntelliJ로 띄울 때는 적용되지 않는다</span>
+            <p>
+              이 처리는 <code>run-local.ps1</code>을 거칠 때만 동작한다.
+              IntelliJ 실행 구성으로 띄우면 WSL이 여전히 잠들 수 있다.
+              그때는 <code>wsl -u root -- systemctl start redis-server</code>를 한 번 실행하거나,
+              전역 설정을 쓰는 편이 낫다.
+            </p>
+          </div>
+        </article>
+
+        <article class="change reverted">
+          <header>
+            <h3>MySQL 호스트 환경변수화 — 시도했다가 되돌림</h3>
+            <span class="tag revert">되돌림</span>
+          </header>
+          <p class="files">resources/application.yml (원상복구)</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                Redis와 같은 이유로 JDBC URL의 <code>localhost</code>도
+                <code>${DATABASE_HOST:localhost}</code>로 바꾸려 했다.
+                <code>.env</code>에 <code>DATABASE_HOST</code>가 이미 있는데 아무 데서도 쓰이지 않고 있었기 때문이다.
+              </p>
+            </dd>
+            <dt>문제</dt>
+            <dd>
+              <p>
+                바꾸고 기동해 보니 백엔드가 DB에 붙지 못했다.
+                로컬 <code>.env</code>의 값이 <code>DATABASE_HOST=mysql</code>,
+                즉 <strong>Docker 서비스 이름</strong>이었다. 로컬에는 존재하지 않는 호스트다.
+                그동안 이 변수가 무시되고 있었기에 아무 문제가 없었던 것이고,
+                갑자기 읽기 시작하자 로컬 실행이 깨졌다.
+              </p>
+            </dd>
+            <dt>조치</dt>
+            <dd>
+              <p>
+                JDBC URL을 원래대로 <code>localhost</code>로 되돌렸다.
+                Redis 쪽은 <code>REDIS_HOST</code>가 <code>.env</code>에 없어 기본값이 그대로 쓰이므로 안전하게 유지했다.
+              </p>
+              <p>
+                제대로 고치려면 로컬 <code>.env</code>의 <code>DATABASE_HOST</code>를 <code>localhost</code>로 바꾸거나
+                (이 값은 배포용 <code>SPRING_ENV_FILE</code> 시크릿과 별개다),
+                <code>.env</code>에 없는 새 변수명을 쓰면 된다. 지금은 로컬 실행 안정성을 택했다.
+              </p>
+            </dd>
+          </dl>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>MySQL 호스트를 환경변수로 (되돌렸던 작업의 재시도)</h3>
+            <span class="tag config">설정</span>
+          </header>
+          <p class="files">application.yml · docker-compose.yml</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                바로 위 항목에서 <code>DATABASE_HOST</code> 환경변수화를 시도했다가 되돌렸다.
+                로컬 <code>.env</code>에 <code>DATABASE_HOST=mysql</code>(도커 서비스 이름)이 들어 있어
+                로컬 실행이 깨졌기 때문이다. 그래서 JDBC URL은 <code>localhost</code> 고정으로 남아
+                <strong>도커로 배포하면 DB에 닿지 못하는 상태</strong>였다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                문제의 원인은 "환경변수를 쓰는 것"이 아니라 <strong>하필 이미 다른 값이 들어 있는 이름을 골랐다</strong>는 데 있었다.
+                그래서 <code>.env</code>에 존재하지 않는 새 이름 <code>MYSQL_HOST</code>를 쓰기로 했다.
+                Redis가 <code>REDIS_HOST</code>로 이미 잘 동작하고 있던 방식과 똑같다.
+              </p>
+              <ul>
+                <li><strong>로컬</strong> — <code>.env</code>에 <code>MYSQL_HOST</code>가 없으니 기본값 <code>localhost</code>가 쓰인다</li>
+                <li><strong>도커</strong> — compose가 <code>MYSQL_HOST: mysql</code>을 넘겨 컨테이너 이름으로 찾아간다</li>
+              </ul>
+              <p>
+                <code>.env</code>를 고치지 않아도 되므로 배포용 <code>SPRING_ENV_FILE</code> 시크릿과 충돌하지 않는다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>로컬은 그대로 뜨고, 배포를 되살릴 때 DB 주소만 compose가 바꿔 넣으면 된다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>application.yml</figcaption>
+            <pre><i># DATABASE_HOST를 쓰지 않는 이유:</i>
+<i># 기존 .env에 DATABASE_HOST=mysql(도커 서비스 이름)이 들어 있어 로컬 실행이 깨진다.</i>
+<i># .env에 없는 새 이름을 써서 로컬은 기본값 localhost, 도커는 compose가 mysql로 덮어쓰게 한다.</i>
+url: jdbc:mysql://<b>${MYSQL_HOST:localhost}</b>:<b>${MYSQL_PORT:3306}</b>/${DATABASE_DB}?...</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>docker-compose.yml — spring-be 서비스</figcaption>
+            <pre>environment:
+  SPRING_PROFILES_ACTIVE: dev
+  <i># 컨테이너끼리는 localhost로 서로를 찾을 수 없으므로 서비스 이름을 넘긴다.</i>
+  <b>MYSQL_HOST: mysql</b>
+  REDIS_HOST: redis</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>편지 수정·삭제에 소유자 검사 추가</h3>
+            <span class="tag security">보안</span>
+          </header>
+          <p class="files">service/LetterService.java · controller/LetterController.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                목록·상세 조회는 이미 <code>findByLetterIdAndUser_UserId</code>로 사용자 기준이었는데,
+                <code>PUT /api/letter/{id}</code>와 <code>DELETE /api/letter/{id}</code>는
+                <strong><code>findById</code>로 id만 보고 찾았다.</strong>
+                즉 로그인만 되어 있으면 <strong>남의 편지 번호를 넣어 남의 편지를 고치거나 지울 수 있었다.</strong>
+                일기에서 이미 고쳤던 것과 똑같은 종류의 구멍(IDOR)이 편지에 남아 있던 것이다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                일기와 같은 방식으로 <strong>"내 편지 중에서 찾는" 통로 하나</strong>를 만들고
+                수정·삭제가 모두 그곳을 지나게 했다. 먼저 찾고 나서 소유자를 비교하는 방식은
+                비교를 빠뜨리기 쉬워서, 아예 쿼리 단계에서 걸러낸다.
+              </p>
+              <p>
+                남의 편지 번호를 넣으면 <strong>없는 편지와 똑같이</strong> 취급되어
+                "그 번호의 편지가 존재하는지" 여부조차 새어 나가지 않는다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd>
+              <p>
+                실제로 검증했다. 사용자 A가 만든 편지를 사용자 B의 토큰으로 수정·삭제 요청하면
+                둘 다 거절되고, 편지 내용은 A가 고쳐둔 값 그대로 남아 있었다.
+              </p>
+            </dd>
+          </dl>
+          <figure class="code">
+            <figcaption>service/LetterService.java</figcaption>
+            <pre><i>/**</i>
+<i> * 이 편지가 요청한 사용자의 것인지 확인하는 유일한 통로.</i>
+<i> *</i>
+<i> * findById로 먼저 찾고 나서 소유자를 비교하면 검사를 빠뜨리기 쉬우므로,</i>
+<i> * 아예 "내 편지 중에서" 찾는 쿼리 하나만 쓴다.</i>
+<i> */</i>
+private Letter findOwnedLetter(Long letterId, String userId) {
+    return letterRepository.<b>findByLetterIdAndUser_UserId</b>(letterId, userId)
+            .orElseThrow(() -&gt; new IllegalArgumentException("LetterId not found: " + letterId));
+}
+
+@Transactional
+public void deleteById(Long letterId, String userId) {
+    <i>// deleteById(id)만 부르면 남의 편지도 지워진다.</i>
+    Letter letter = findOwnedLetter(letterId, userId);
+    letterRepository.delete(letter);
+}</pre>
+          </figure>
+
+          <div class="note">
+            <span class="label">함께 고친 것 — 엔티티를 그대로 응답에 실던 문제</span>
+            <p>
+              편지 저장 API가 <code>Letter</code> 엔티티를 그대로 반환하고 있었다.
+              <code>Letter</code>는 <code>User</code>를 참조하므로 직렬화될 때
+              <strong>사용자 정보가 통째로 따라 나간다 — password 해시까지 포함해서.</strong>
+              조회 API들이 쓰던 <code>LetterResponse</code>로 통일했다.
+            </p>
+          </div>
+
+          <div class="note">
+            <span class="label">함께 고친 것 — 수정하면 작성 시각이 날아가던 문제</span>
+            <p>
+              <code>Letter.update()</code>가 요청 값으로 <code>createAt</code>을 덮어쓰고 있었다.
+              클라이언트가 그 값을 빼먹으면 NOT NULL 컬럼이 <code>null</code>이 되어 저장이 깨진다.
+              일기에서 겪었던 것과 같은 문제다. <strong>작성 시각은 수정 대상이 아니므로</strong>
+              메서드 인자에서 아예 빼고, 쓰이지 않던 <code>UpdateLetterRequest.createAt</code>도 지웠다.
+            </p>
+          </div>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>도착한 편지는 고칠 수 없게</h3>
+            <span class="tag feature">기능</span>
+          </header>
+          <p class="files">service/LetterService.java · exception/BusinessRuleException.java · utils/letter.js</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                편지 수정 화면을 붙이면서 생긴 질문이다. <strong>이미 받아 본 편지도 고칠 수 있어야 하나?</strong>
+                고칠 수 있게 두면 과거의 내가 쓴 글을 지금의 내가 다시 쓰는 셈이라
+                <strong>타임캡슐이라는 전제가 무너진다.</strong> 그래서 막기로 했다.
+              </p>
+              <p>
+                화면에서 버튼만 숨기는 건 의미가 없다. API를 직접 호출하면 그만이므로
+                <strong>서버에서 막고, 화면은 누를 수 없는 버튼을 보여주지 않는 역할</strong>만 한다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                이 거절은 사용자가 <strong>이유를 알아야 고칠 수 있는</strong> 상황이라
+                기존 <code>IllegalArgumentException</code>(문구를 감추고 일반 메시지로 대체)으로는 맞지 않았다.
+                사용자용 문구를 그대로 내보내는 <code>BusinessRuleException</code>을 새로 만들었다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd>
+              <p>
+                미도착 편지에만 「고쳐 쓰기」 버튼이 보이고, 도착한 편지에는 「삭제」만 보인다.
+                API를 직접 찔러도 <code>400 "이미 도착한 편지는 수정할 수 없어요."</code>가 돌아온다.
+              </p>
+            </dd>
+          </dl>
+          <figure class="code">
+            <figcaption>service/LetterService.java</figcaption>
+            <pre>Letter letter = findOwnedLetter(letterId, userId);
+
+<i>// 이미 도착한 편지는 고칠 수 없다.</i>
+<i>// 과거의 내가 쓴 글을 지금의 내가 고쳐 쓰면 타임캡슐이라는 전제가 무너진다.</i>
+if (letter.isDelivered() || !letter.getDeliverDate().isAfter(LocalDateTime.now())) {
+    throw new <b>BusinessRuleException</b>("이미 도착한 편지는 수정할 수 없어요.");
+}</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>src/utils/letter.js — 화면 쪽 판단은 한 곳에만</figcaption>
+            <pre><i>/**</i>
+<i> * 아직 고칠 수 있는 편지인가.</i>
+<i> * 백엔드도 같은 규칙으로 막고 있어서, 여기서 감추는 건</i>
+<i> * "누를 수 없는 버튼을 보여주지 않기 위한" 화면 쪽 판단이다.</i>
+<i> */</i>
+export const <b>isEditable</b> = (letter) =&gt; !isArrived(letter);</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>비밀번호가 틀리면 로그아웃되던 문제</h3>
+            <span class="tag security">보안</span>
+          </header>
+          <p class="files">service/UserService.java · exception/BusinessRuleException.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                비밀번호 변경 화면을 만들고 <strong>일부러 현재 비밀번호를 틀리게 넣어봤더니
+                로그인이 풀려 버렸다.</strong>
+              </p>
+              <p>
+                원인은 <strong>401을 두 가지 뜻으로 쓰고 있었다</strong>는 데 있었다.
+                로그인 실패 문구를 정리하면서 만든 <code>InvalidCredentialsException</code>이
+                비밀번호 변경 실패에도 쓰이고 있었는데, 이게 401로 나간다.
+                프런트의 <code>http.js</code>는 401을 <strong>"토큰이 만료됐다"</strong>는 신호로 읽도록 되어 있어서,
+                토큰 재발급을 시도하고 그마저 실패하자 세션을 정리해 버린 것이다.
+              </p>
+              <figure class="code" style="margin-top:12px;">
+                <figcaption>실제 네트워크 기록 — 고치기 전</figcaption>
+                <pre>PUT  /api/user/info/password  → <b>401</b>   <i>// 비밀번호가 틀렸을 뿐인데</i>
+POST /api/token               → 401   <i>// http.js가 토큰 만료로 오해하고 재발급 시도</i>
+                                       <i>// → 재발급도 실패 → 로그아웃</i></pre>
+              </figure>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                상태 코드를 <strong>400</strong>으로 바꿨다. 401은 "당신이 누구인지 확인할 수 없다"는 뜻인데,
+                이 요청은 <strong>이미 인증을 통과했다.</strong> 토큰은 멀쩡하고, 틀린 건 본문에 담아 보낸 값이다.
+                그건 인증 실패가 아니라 <strong>입력값 검증 실패</strong>다.
+              </p>
+              <p>
+                <strong>로그인 실패는 401 그대로 두었다.</strong> 그쪽은 정말로 인증이 안 된 상태이고,
+                애초에 토큰 없이 보내는 요청(<code>auth:false</code>)이라 재발급 로직을 타지도 않는다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd>
+              <p>
+                다시 재현해보니 <code>400</code>이 돌아오고, 화면에 "현재 비밀번호가 올바르지 않습니다."가 뜨며
+                <strong>마이페이지에 그대로 머문다.</strong>
+              </p>
+            </dd>
+          </dl>
+          <figure class="code">
+            <figcaption>service/UserService.java</figcaption>
+            <pre>if (!passwordEncoder.matches(oldPassword, users.getPassword())) {
+    <i>// 401이 아니라 400인 이유:</i>
+    <i>// 이 요청은 이미 인증을 통과했다(토큰은 멀쩡하다). 틀린 건 본문에 담아 보낸 값이다.</i>
+    <i>// 401로 내보내면 프런트의 http.js가 "토큰이 만료됐다"로 오해해서</i>
+    <i>// 토큰 재발급을 시도하고, 그마저 실패하면 사용자를 로그아웃시켜 버린다.</i>
+    throw new <b>BusinessRuleException</b>(
+            "현재 비밀번호가 올바르지 않습니다.",
+            "비밀번호 변경 실패 - 현재 비밀번호 불일치: " + userId);
+}</pre>
+          </figure>
+          <div class="note">
+            <span class="label">배운 것</span>
+            <p>
+              상태 코드는 <strong>클라이언트가 분기하는 스위치</strong>다.
+              같은 코드에 두 가지 뜻을 담으면 클라이언트가 반드시 하나를 오해한다.
+              "인증 자체가 안 됐다"(401)와 "인증은 됐는데 값이 틀렸다"(400)는 반드시 나눠야 한다.
+            </p>
+          </div>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>화면이 없던 API 세 개에 화면 붙이기</h3>
+            <span class="tag feature">기능</span>
+          </header>
+          <p class="files">components/mypage/* · components/letter/* · components/common/ConfirmDialog.jsx</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                비밀번호 변경·회원 탈퇴·편지 수정은 <strong>백엔드에만 있고 부르는 곳이 없었다.</strong>
+                호출되지 않는 API는 동작을 검증할 방법도 없어서, 실제로 이번에 화면을 붙이자마자
+                <strong>양쪽 모두에서 버그가 나왔다.</strong> (위의 두 항목이 그것이다)
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>마이페이지를 세 덩어리로 다시 짰다.</p>
+              <ul>
+                <li><strong>프로필 카드</strong> — 기존 정보와 통계</li>
+                <li><strong>계정 설정 카드</strong> — 닉네임 · 비밀번호를 같은 모양의 구획으로</li>
+                <li><strong>위험 구역</strong> — 회원 탈퇴만 따로, 붉은 톤으로 분리</li>
+              </ul>
+              <p>
+                편지 쪽은 보낸 편지함의 카드에 「고쳐 쓰기」·「삭제」를 달았다.
+                카드 전체가 <code>&lt;button&gt;</code>이던 구조라 버튼 안에 버튼이 들어가는
+                잘못된 마크업이 되므로, <strong>바깥을 <code>&lt;div&gt;</code>로 바꾸고
+                "본문을 누르는 영역"만 버튼으로 남겼다.</strong>
+              </p>
+              <p>
+                되돌릴 수 없는 동작은 <code>ConfirmDialog</code> 하나로 통일했다.
+                편지 삭제는 확인만, <strong>회원 탈퇴는 아이디를 직접 입력해야</strong> 버튼이 열린다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd>
+              <p>
+                백엔드에만 있던 기능 세 개가 실제로 쓰이게 됐고, 그 과정에서
+                로그아웃 버그와 탈퇴 실패 버그를 찾아 고쳤다.
+              </p>
+            </dd>
+          </dl>
+          <figure class="code">
+            <figcaption>components/common/ConfirmDialog.jsx</figcaption>
+            <pre><i>/**</i>
+<i> * 되돌릴 수 없는 동작을 실행하기 전에 한 번 더 묻는 창.</i>
+<i> *</i>
+<i> * confirmText를 넘기면 사용자가 그 문자열을 정확히 입력해야 버튼이 열린다.</i>
+<i> * 편지 삭제처럼 다시 만들 수 있는 것은 그냥 확인만,</i>
+<i> * 회원 탈퇴처럼 복구가 불가능한 것은 손으로 한 번 타이핑하게 만든다.</i>
+<i> */</i>
+const ready = !busy &amp;&amp; (!confirmText || typed.trim() === confirmText);</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>components/letter/LetterList.jsx — 버튼 노출은 화면이 결정</figcaption>
+            <pre>&lt;LetterCard
+  letter={letter}
+  arrived={isArrived(letter)}
+  onClick={onSelect}
+  <i>{/* 받은 편지함처럼 읽기만 하는 화면은 onEdit을 넘기지 않으면 버튼이 아예 안 그려진다 */}</i>
+  onEdit={onEdit &amp;&amp; <b>canEdit?.(letter)</b> ? onEdit : undefined}
+  onDelete={onDelete}
+/&gt;</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>탈퇴하면 실패하던 문제 — 남은 데이터와 토큰 사본</h3>
+            <span class="tag security">보안</span>
+          </header>
+          <p class="files">service/UserService.java · controller/UserApiController.java · service/TokenService.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>탈퇴 화면을 붙이고 눌러보니 두 가지가 드러났다.</p>
+              <ol>
+                <li>
+                  <strong>일기나 편지가 하나라도 있으면 탈퇴가 실패한다.</strong>
+                  <code>diary.user_id</code>·<code>letter.user_id</code>는 NOT NULL 외래 키인데
+                  JPA cascade를 걸어두지 않아서, 부모인 <code>user</code>를 먼저 지우려 하면
+                  제약 위반으로 막힌다. 데이터가 없는 새 계정으로만 테스트했다면 못 봤을 문제다.
+                </li>
+                <li>
+                  <strong>계정을 지워도 Redis의 refreshToken 사본이 남는다.</strong>
+                  그러면 탈퇴한 아이디로도 <strong>최대 24시간 동안 accessToken을 계속 재발급</strong>받을 수 있다.
+                </li>
+              </ol>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                삭제 순서를 <strong>자식 → 부모</strong>로 명시하고,
+                컨트롤러에서 <strong>Redis 사본과 쿠키까지</strong> 함께 정리하게 했다.
+                로그아웃과 탈퇴가 같은 쿠키 삭제 로직을 쓰도록 헬퍼로 뽑았다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd>
+              <p>
+                일기 1건·편지 1건을 가진 계정으로 탈퇴해 <code>200</code>을 확인했고,
+                <strong>같은 아이디로 다시 가입해 조회하니 일기 0건·편지 0건</strong>이었다.
+                이전 데이터가 새 계정에 딸려오지 않는다는 뜻이다.
+              </p>
+            </dd>
+          </dl>
+          <figure class="code">
+            <figcaption>service/UserService.java</figcaption>
+            <pre><i>/**</i>
+<i> * diary/letter의 user_id는 NOT NULL 외래 키라서, user를 먼저 지우려 하면</i>
+<i> * 제약 위반으로 실패한다. (JPA cascade를 걸지 않았으므로 순서를 직접 지켜야 한다.)</i>
+<i> */</i>
+@Transactional
+public void deleteUser(String userId) {
+    letterRepository.deleteByUser_UserId(userId);   <i>// 자식</i>
+    diaryRepository.deleteByUser_UserId(userId);    <i>// 자식</i>
+    userRepository.deleteById(userId);              <i>// 부모</i>
+}</pre>
+          </figure>
+          <figure class="code">
+            <figcaption>controller/UserApiController.java</figcaption>
+            <pre><i>// 계정만 지우고 끝내면 Redis에 refreshToken 사본이 남아, 탈퇴한 아이디로도</i>
+<i>// 24시간 동안 accessToken을 계속 재발급받을 수 있다. 사본과 쿠키까지 함께 지운다.</i>
+userService.deleteUser(userId);
+<b>tokenService.deleteRefreshTokenByUserId(userId);</b>
+response.addHeader("Set-Cookie", <b>expiredRefreshTokenCookie()</b>.toString());</pre>
+          </figure>
+        </article>
+
+        <article class="change">
+          <header>
+            <h3>잘못된 요청 본문이 500으로 보고되던 문제</h3>
+            <span class="tag ops">운영</span>
+          </header>
+          <p class="files">config/GlobalExceptionHandler.java</p>
+          <dl class="qa">
+            <dt>왜</dt>
+            <dd>
+              <p>
+                이번 검증 중에 우연히 발견했다. 터미널에서 한글이 깨진 채로 요청을 보냈더니
+                <code>500 "서버에 문제가 발생했습니다"</code>가 돌아왔다.
+                실제 원인은 <code>Invalid UTF-8 start byte</code> — <strong>서버가 아니라 요청이 잘못된 것</strong>이었다.
+              </p>
+              <p>
+                500으로 보이면 원인을 서버에서 찾게 되어 디버깅이 크게 돌아간다.
+                실제로 이 때문에 잠깐 코드를 의심했다.
+              </p>
+            </dd>
+            <dt>어떻게</dt>
+            <dd>
+              <p>
+                <code>HttpMessageNotReadableException</code>(JSON 형식 오류, 인코딩 오류,
+                날짜 형식 불일치 등)을 <strong>400</strong>으로 처리하는 핸들러를 추가했다.
+                사용자에게는 기존 문구를 그대로 주고, 콘솔에는 근본 원인을 남긴다.
+              </p>
+            </dd>
+            <dt>결과</dt>
+            <dd><p>요청이 잘못된 경우와 서버가 잘못된 경우가 상태 코드로 구분된다.</p></dd>
+          </dl>
+          <figure class="code">
+            <figcaption>config/GlobalExceptionHandler.java</figcaption>
+            <pre>@ExceptionHandler(HttpMessageNotReadableException.class)
+public ResponseEntity&lt;ErrorResponse&gt; handleUnreadableBody(HttpMessageNotReadableException e,
+                                                          HttpServletRequest request) {
+    log.warn("[{} {}] 본문을 읽을 수 없음: {}",
+            request.getMethod(), request.getRequestURI(), <b>rootCauseOf(e)</b>);
+
+    return build(HttpStatus.<b>BAD_REQUEST</b>, MSG_BAD_REQUEST, request);
+}</pre>
+          </figure>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ 실행 방법 ============ -->
+    <section id="run">
+      <h2>실행 방법</h2>
+      <p class="sub">Docker 없이 로컬에서 띄우는 순서</p>
+
+      <ol class="steps">
+        <li>
+          <h4>MySQL 확인</h4>
+          <p>
+            윈도우에 설치된 MySQL이 3306에서 실행 중이어야 한다.
+            <code>.env</code>의 <code>DATABASE_DB</code> 이름으로 된 데이터베이스가 있어야 하며,
+            테이블은 <code>ddl-auto: update</code>가 첫 실행에 만든다.
+          </p>
+        </li>
+        <li>
+          <h4>Redis 실행</h4>
+          <p>WSL 안에 설치돼 있다. PowerShell에서 <code>wsl</code>로 진입한 뒤 sudo 없이 실행한다.</p>
+          <figure class="code">
+            <pre>redis-server --bind 0.0.0.0 --protected-mode no \
+             --daemonize yes --dir /tmp --pidfile /tmp/redis.pid</pre>
+          </figure>
+          <p><code>redis-cli ping</code>이 <code>PONG</code>을 내면 성공. <code>exit</code>으로 나가도 계속 살아 있다.</p>
+        </li>
+        <li>
+          <h4>백엔드 기동</h4>
+          <p>
+            IntelliJ 실행 구성에서 <strong><code>EmoLetter BE (local)</code></strong>를 고른다.
+            <code>Dockerfile</code> 구성을 고르면 “Server Docker not found”가 뜬다.
+            터미널을 선호하면 <code>EmoLetter_BE/run-local.ps1</code>이 <code>.env</code>를 읽어 그대로 띄운다.
+          </p>
+        </li>
+        <li>
+          <h4>프론트엔드 기동</h4>
+          <figure class="code">
+            <pre>cd EmoLetter_FE
+npm install
+npm run dev        <i># http://localhost:5173</i></pre>
+          </figure>
+        </li>
+      </ol>
+
+      <div class="note caution">
+        <span class="label">환경변수는 자동으로 읽히지 않는다</span>
+        <p>
+          <code>build.gradle</code>에 dotenv 의존성이 없어 스프링은 <code>.env</code>를 스스로 읽지 못한다.
+          그동안은 Docker의 <code>env_file</code>이 대신 넣어주고 있었다. IntelliJ 실행 구성은
+          <code>envFilePaths</code>로 <code>.env</code>를 직접 읽도록 설정해두었고,
+          <code>run-local.ps1</code>은 CRLF까지 처리해 환경변수로 주입한다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 알려진 이슈 ============ -->
+    <section id="issues">
+      <h2>알려진 이슈</h2>
+      <p class="sub">해결된 것과, 아직 남아 있는 것</p>
+
+      <h3>해결됨 (2026.08.27)</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>항목</th><th>조치</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td>배포 자동 트리거</td><td>트리거를 <code>workflow_dispatch</code>로 변경. push해도 배포가 돌지 않는다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>토큰 재발급 불가</td><td>백엔드가 쿠키에서 refreshToken을 읽고, 프런트는 401에 재발급 후 재시도</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>인증 실패 시 403 반환</td><td><code>HttpStatusEntryPoint(401)</code> 지정. 재발급 로직이 동작하려면 401이어야 했다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>편지 제목 없음</td><td><code>title</code> 컬럼 추가(nullable). 목록은 제목 없으면 본문 발췌로 대체</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>일기 소유자 검사</td><td>단건 조회·수정·삭제를 <code>findOwnedDiary</code>로 통일</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>Redis 설정 무효</td><td><code>spring.data.redis</code>로 이동 + compose에 <code>REDIS_HOST: redis</code></td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>장애 원인이 안 보임 <span class="status ok">08.31</span></td><td><code>@RestControllerAdvice</code>로 사용자 응답과 개발자 로그를 분리. Redis·DB 장애는 503</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>로그인 실패 문구 <span class="status ok">08.31</span></td><td><code>InvalidCredentialsException</code>. 아이디 유무를 노출하지 않는 401 문구</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>WSL Redis 끊김 <span class="status ok">08.31</span></td><td><code>run-local.ps1</code>이 WSL을 깨우고 세션 동안 붙잡아 둔다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>MySQL 호스트 하드코딩 <span class="status ok">09.03</span></td><td><code>.env</code>에 없는 새 이름 <code>MYSQL_HOST</code>를 써서 로컬은 기본값, 도커는 compose가 덮어쓴다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>편지 소유자 검사 (수정·삭제) <span class="status ok">09.03</span></td><td><code>findOwnedLetter</code>로 통일. 남의 편지 번호를 넣으면 없는 편지와 동일하게 취급</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>미사용 API <span class="status ok">09.03</span></td><td>비밀번호 변경·회원 탈퇴는 마이페이지에, 편지 수정은 보낸 편지함에 화면 추가</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>탈퇴 시 FK 제약 위반 <span class="status ok">09.03</span></td><td>자식(편지·일기) → 부모(계정) 순서로 삭제. Redis 사본과 쿠키도 함께 정리</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>비밀번호 오류가 로그아웃 유발 <span class="status ok">09.03</span></td><td>401 → 400. 인증 실패와 입력값 오류를 상태 코드로 분리</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>편지 저장 응답에 사용자 정보 노출 <span class="status ok">09.03</span></td><td>엔티티 대신 <code>LetterResponse</code> 반환. password 해시가 응답에 실리지 않는다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>편지 수정 시 작성 시각 유실 <span class="status ok">09.03</span></td><td><code>Letter.update()</code>에서 <code>createAt</code> 제거. 작성 시각은 수정 대상이 아니다</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>잘못된 요청 본문이 500 <span class="status ok">09.03</span></td><td><code>HttpMessageNotReadableException</code>을 400으로 처리</td><td><span class="status ok">해결</span></td></tr>
+            <tr><td>테스트 데이터 <span class="status ok">09.03</span></td><td>검증용으로 만든 계정을 정리했다. 아래 「남아 있는 것」에 남은 항목 참고</td><td><span class="status ok">일부 해결</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>남아 있는 것</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th><th>해결 방향</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>남은 테스트 계정</td>
+              <td>
+                로컬 DB에 <code>testuser1</code>(일기 1건·편지 2건)과 <code>test01</code>(편지 1건)이 남아 있다.
+                이번에 검증용으로 만든 계정은 정리했지만, 이 둘은 이전부터 있던 데이터라 손대지 않았다.
+                <code>sonyoo</code>는 실제 사용 계정이므로 대상이 아니다.
+              </td>
+              <td>마이페이지의 회원 탈퇴로 지우거나, 필요 없으면 SQL로 직접 삭제</td>
+            </tr>
+            <tr>
+              <td>refreshToken 회전 없음</td>
+              <td>
+                재발급 시 accessToken만 새로 만들고 refreshToken은 그대로 둔다.
+                24시간이 지나면 재발급도 막히고 다시 로그인해야 한다.
+              </td>
+              <td>재발급 때 refreshToken도 새로 발급(rotation). 지금 동작에는 문제가 없어 미뤄둠</td>
+            </tr>
+            <tr>
+              <td>로그아웃 즉시 차단 불가</td>
+              <td>
+                이미 발급된 accessToken은 서버가 기억하지 않아 회수할 수 없다.
+                프런트가 지우므로 정상 사용에서는 문제없지만, 유출된 토큰은 최대 1시간 유효하다.
+              </td>
+              <td>Redis 블랙리스트. 다만 매 요청마다 Redis 조회가 생겨 무상태의 이점을 일부 포기하게 된다</td>
+            </tr>
+            <tr>
+              <td>배포 파이프라인 중단</td>
+              <td>EC2/DockerHub 배포가 끊긴 상태라 워크플로 트리거를 <code>workflow_dispatch</code>로 막아두었다</td>
+              <td>인프라를 되살릴 때 트리거 복원 (방법은 워크플로 주석에 남겨둠)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="end">
+    EmoLetter 개발 핸드북 · 2026년 8월 23일 작성, 9월 3일 개정 · 변경 사항은 로컬 환경에서 실제 동작 검증 완료
+  </footer>
+
+</div>
